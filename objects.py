@@ -85,28 +85,40 @@ class PacMan(Entity):
         move_v = key_down - key_up
         self.hsp = move_h*self.movespeed
         self.vsp = move_v*self.movespeed
-        # move and collide
-        self.collide()
-        self.rect = self.rect.move([self.hsp, self.vsp])
 
+        # horizontal collision and movement
+        if self.meeting_platform(self.rect.move([self.hsp, 0])):
+            while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
+                self.rect = self.rect.move([np.sign(self.hsp), 0])
+            self.hsp = 0
+
+        self.rect = self.rect.move([self.hsp, 0])
+
+        # vertical collision and movement
+        if self.meeting_platform(self.rect.move([0, self.vsp])):
+            while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
+                self.rect = self.rect.move([0, np.sign(self.vsp)])
+            self.vsp = 0
+
+        self.rect = self.rect.move([0, self.vsp])
 
     def collide(self):
         for p in self.platforms:
-            # if pygame.sprite.collide_rect(self, p):
-            #     if self.move_h > 0:
-            #         self.rect.right = p.rect.left
-            #     if self.move_h < 0:
-            #         self.rect.left = p.rect.right
-            #     if self.move_v > 0:
-            #         self.rect.top = p.rect.bottom
-            #     if self.move_v < 0:
-            #         self.rect.bottom = p.rect.top
             if pygame.sprite.collide_rect(self.rect.move([self.hsp, self.vsp]), p):
                 while not pygame.sprite.collide_rect(self.rect.move([np.sign(self.hsp), np.sign(self.vsp)]), p):
                     self.rect = self.rect.move([np.sign(self.hsp), np.sign(self.vsp)])
-                self.hsp = 0
-                self.vsp = 0
+                if pygame.sprite.collide_rect(self.rect.move([np.sign(self.hsp), 0]), p):
+                    self.hsp = 0
+                if pygame.sprite.collide_rect(self.rect.move([0, np.sign(self.vsp)]), p):
+                    self.vsp = 0
+
+    def meeting_platform(self, rect):
+        for p in self.platforms:
+            if pygame.sprite.collide_rect(rect, p):
+                return True
+
 
 
 class Ghost(Entity):
+    # todo: implement
     pass
