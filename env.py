@@ -115,11 +115,13 @@ class Env:
 if __name__ == "__main__":
     env = Env()
     while 1:
+
         obs, reward, done, info = env.render()
         env.timer.tick(60)
         plt.imshow(obs["pacman"])
         plt.show()
-        
+
+        # pacman und ghosts have  ActionSpace = IDLE, UP, DOWN, LEFT, RIGHT
         env.player.action = env.player.ActionSpace.DOWN
         env.ghost.action = env.ghost.ActionSpace.DOWN
         env.ghost2.action = env.ghost2.ActionSpace.UP
