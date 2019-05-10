@@ -7,5 +7,5 @@ class GLOBALS:
     width = 1280
     height = 720
     size = width, height
-    SCREEN_SIZE = pygame.Rect((0, 0, 32*32, 12*32))
+    SCREEN_SIZE = pygame.Rect((0, 0, 20*32, 18*32))
     TILE_SIZE = 32

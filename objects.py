@@ -3,7 +3,7 @@ import os
 import numpy as np
 from pygame.locals import *
 from globals import GLOBALS
-
+from env import ActionSpace
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('img', name)
@@ -51,41 +51,16 @@ class CameraAwareLayeredUpdates(pygame.sprite.LayeredUpdates):
 
 
 class Entity(pygame.sprite.Sprite):
-    def __init__(self, color, pos, *groups):
-        super().__init__(*groups)
-        self.image = pygame.Surface((GLOBALS.TILE_SIZE, GLOBALS.TILE_SIZE))
-        self.image.fill(color)
-        self.rect = self.image.get_rect(topleft=pos)
-
-
-class Wall(Entity):
-    def __init__(self, pos, *groups):
-        super().__init__(Color("#DDDDDD"), pos, *groups)
-
-
-class PacMan(Entity):
-    def __init__(self, platforms, pos, *groups):
-        super().__init__(Color("#0000FF"), pos)
-        self.image, self.rect = load_image('pacman.png')
-        self.movespeed = 5
-        self.hsp = 0
-        self.vsp = 0
-        self.platforms = platforms
-
-    def update(self):
-        # get keyboard inputs
-        # subject to change with simulated env
-        pressed = pygame.key.get_pressed()
-        key_left = pressed[pygame.K_a]
-        key_right = pressed[pygame.K_d]
-        key_up = pressed[pygame.K_w]
-        key_down = pressed[pygame.K_s]
-
-        move_h = key_right - key_left
-        move_v = key_down - key_up
-        self.hsp = move_h*self.movespeed
-        self.vsp = move_v*self.movespeed
-
+    def __init__(self, *group):
+        super().__init__(*group)
+        
+    
+    def meeting_platform(self, rect):
+        for p in self.platforms:
+            if pygame.sprite.collide_rect(rect, p):
+                return True
+    
+    def move(self):
         # horizontal collision and movement
         if self.meeting_platform(self.rect.move([self.hsp, 0])):
             while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
@@ -102,23 +77,125 @@ class PacMan(Entity):
 
         self.rect = self.rect.move([0, self.vsp])
 
-    def collide(self):
-        for p in self.platforms:
-            if pygame.sprite.collide_rect(self.rect.move([self.hsp, self.vsp]), p):
-                while not pygame.sprite.collide_rect(self.rect.move([np.sign(self.hsp), np.sign(self.vsp)]), p):
-                    self.rect = self.rect.move([np.sign(self.hsp), np.sign(self.vsp)])
-                if pygame.sprite.collide_rect(self.rect.move([np.sign(self.hsp), 0]), p):
-                    self.hsp = 0
-                if pygame.sprite.collide_rect(self.rect.move([0, np.sign(self.vsp)]), p):
-                    self.vsp = 0
 
-    def meeting_platform(self, rect):
-        for p in self.platforms:
-            if pygame.sprite.collide_rect(rect, p):
-                return True
+class Wall(Entity):
+    def __init__(self, pos, group):
+        super().__init__(group)
+        self.image, self.rect = load_image('wall.png')
+        self.rect.topleft = pos
 
+
+class Coin(Entity):
+    def __init__(self, pos, group):
+        super().__init__(group)
+        self.image, self.rect = load_image('coin.png')
+        self.rect.topleft = pos
+
+
+class PacMan(Entity):
+    def __init__(self, group, platforms, coins, ghosts, pos):
+        super().__init__(group)
+        self.lives = 3
+        self.points = 0
+        self.image, self.rect = load_image('pacman.png')
+        self.start = pos
+        self.rect.topleft = pos
+        self.movespeed = 3
+        self.hsp = 0
+        self.vsp = 0
+        self.platforms = platforms
+        self.coins = coins
+        self.ghosts = ghosts
+        self.lost = False
+        self.ActionSpace = ActionSpace
+        self.action = ActionSpace.IDLE
+        
+    def update(self):
+        # get keyboard inputs
+        # subject to change with simulated env
+        if self.action == self.ActionSpace.IDLE:
+            move_h = 0
+            move_v = 0
+        if self.action == self.ActionSpace.UP:
+            move_h = 0
+            move_v = -1
+        if self.action == self.ActionSpace.DOWN:
+            move_h = 0
+            move_v = 1
+        if self.action == self.ActionSpace.LEFT:
+            move_h = -1
+            move_v = 0
+        if self.action == self.ActionSpace.RIGHT:
+            move_h = 1
+            move_v = 0
+
+        self.hsp = move_h*self.movespeed
+        self.vsp = move_v*self.movespeed
+
+        # horizontal collision and movement
+        self.move()
+        
+        # check for coins
+        for c in self.coins:
+            if pygame.sprite.collide_rect(self, c):
+                c.kill()
+                self.points += 1
+                self.reward = 10
+            else:
+                self.reward = 0
+        
+        # check for collision with ghosts
+        for g in self.ghosts:
+            if pygame.sprite.collide_rect(self, g):
+                self.lives -= 1
+                g.reward = 10
+                self.rect.topleft = self.start
+                for g in self.ghosts:
+                    g.rect.topleft = g.start
+                break
+            else:
+                g.reward = 0
+                # todo: reset ghosts and player positions
+        
+        # check for lives
+        if self.lives == 0:
+            self.lost = True
 
 
 class Ghost(Entity):
-    # todo: implement
-    pass
+    def __init__(self, group, platforms, pos):
+        super().__init__(group)
+        self.image, self.rect = load_image('ghost.png')
+        self.start = pos
+        self.rect.topleft = pos
+        self.movespeed = 2
+        self.hsp = 0
+        self.vsp = 0
+        self.platforms = platforms
+        self.ActionSpace = ActionSpace
+        self.action = ActionSpace.IDLE
+
+    def update(self):
+        if self.action == self.ActionSpace.IDLE:
+            move_h = 0
+            move_v = 0
+        if self.action == self.ActionSpace.UP:
+            move_h = 0
+            move_v = -1
+        if self.action == self.ActionSpace.DOWN:
+            move_h = 0
+            move_v = 1
+        if self.action == self.ActionSpace.LEFT:
+            move_h = -1
+            move_v = 0
+        if self.action == self.ActionSpace.RIGHT:
+            move_h = 1
+            move_v = 0
+
+        self.hsp = move_h*self.movespeed
+        self.vsp = move_v*self.movespeed
+
+        # horizontal collision and movement
+        self.move()
+
+        
