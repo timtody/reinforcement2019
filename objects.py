@@ -5,6 +5,7 @@ from pygame.locals import *
 from globals import GLOBALS
 from env import ActionSpace
 
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('img', name)
     try:
