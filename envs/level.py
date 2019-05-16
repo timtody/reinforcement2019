@@ -1,0 +1,20 @@
+class Level:
+    string_representation = [
+        "PPPPPPPPPPPPPPPPPPPP",
+        "P  P               P",
+        "P           P  P   P",
+        "P   PP      P  P   P",
+        "P    P      PPP    P",
+        "P           PPP    P",
+        "P    PPPPPPPPPPPPP P",
+        "P                  P",
+        "P        P PP PPP  P",
+        "P         P  PPPP  P",
+        "P         P   PPP  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "PPPPPPPPPPPPPPPPPPPP", ]
