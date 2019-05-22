@@ -83,10 +83,12 @@ class Env:
         pygame.display.update()
 
         # setup return values for render
-        self.observation["pacman"] = pygame.surfarray.array2d(self.screen).T
-        self.observation["ghosts"][0] = pygame.surfarray.array2d(self.screen).T
-        self.observation["ghosts"][1] = pygame.surfarray.array2d(self.screen).T
-        self.observation["ghosts"][2] = pygame.surfarray.array2d(self.screen).T
+        screen = pygame.surfarray.array2d(self.screen).T
+        screen = screen/np.max(screen)
+        self.observation["pacman"] = screen
+        self.observation["ghosts"][0] = screen
+        self.observation["ghosts"][1] = screen
+        self.observation["ghosts"][2] = screen
 
         self.reward["pacman"] = self.player.reward
         self.reward["ghosts"][0] = self.ghost.reward
