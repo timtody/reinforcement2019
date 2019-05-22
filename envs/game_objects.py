@@ -141,7 +141,6 @@ class PacMan(Entity):
         for c in self.coins:
             if pygame.sprite.collide_rect(self, c):
                 c.kill()
-                print("GOT REWARD YUHJUU")
                 self.points += 1
                 self.reward = 10
         

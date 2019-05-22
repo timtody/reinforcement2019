@@ -45,7 +45,6 @@ def runExp(*args, **kwargs):
                 a = np.random.randint(0, 5)
             else:
                 a = np.argmax(pacModel.predict(s))
-                print('pred action', a)
             #act here
             if a == 0:
                 action = env.player.ActionSpace.IDLE
@@ -64,7 +63,6 @@ def runExp(*args, **kwargs):
                 currentReward += reward['pacman']
             obs, reward, done, info = env.render()
             currentReward += reward["pacman"]
-            #print(currentReward)
             r = currentReward
             obspac = np.array(obs["pacman"])
             new_s = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
