@@ -11,7 +11,7 @@ def pacmanNetConfig():
     # Network input/output shape
     rc.input_x_dim = 576
     rc.input_y_dim = 640
-    rc.c_channels = 3
+    rc.c_channels = 1
     rc.num_actions = 5
 
     rc.optimizer = 'adadelta' # other options: 'sgd', 'adam', 'adagrad'
@@ -49,7 +49,7 @@ def defaultConfig():
 
     # Dynamic folder- and filenames
     rc.weights_load_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
-    rc.weights_save_path = ['dynamic', "'{0}model_at_{1}_epochs_weights.h5'.format(self.log_dir, self.epochs)"]
+    rc.weights_save_path = ['dynamic', "'{0}model_at_{1}_epochs_weights.h5'.format(self.log_dir, self.num_episodes)"]
     rc.weights_checkpoint_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
     rc.model_checkpoint_path = ['dynamic', "self.log_dir + 'best_model.h5'"]
     rc.image_dir = ['dynamic', "self.log_dir + 'images/'"]
