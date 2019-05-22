@@ -52,6 +52,29 @@ class Env:
                 x += self.TILE_SIZE
             y += self.TILE_SIZE
             x = 0
+    
+    def reset(self):
+        # delete all current coins and players
+        for sprite in self.entities.sprites():
+            sprite.kill()
+        for coin in self.coins.sprites():
+            coin.kill()
+        
+        # reinit the playables
+        self.ghost = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*10, self.TILE_SIZE*10))
+        self.ghost2 = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*12, self.TILE_SIZE*12))
+        self.ghost3 = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*14, self.TILE_SIZE*14))
+        self.player = PacMan([self.playables, self.entities], self.platforms, self.coins, self.ghosts, (self.TILE_SIZE*3, self.TILE_SIZE*3))
+        
+        x = y = 0
+        # replace the coins
+        for row in self.level.string_representation:
+            for col in row:
+                if col == " " and not (x, y) == self.player.rect.topleft:
+                    Coin((x, y), self.coins)
+                x += self.TILE_SIZE
+            y += self.TILE_SIZE
+            x = 0
 
     def render(self):
         for e in pygame.event.get():
@@ -111,3 +134,4 @@ class Env:
         self.info["player"]["lives"] = self.player.lives
 
         return self.observation, self.reward, self.done, self.info
+
