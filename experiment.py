@@ -29,8 +29,9 @@ def runExp(*args, **kwargs):
     eps = 0.5
     decay_factor = 0.999
     r_avg_list = []
+    env = mazewandererenv.Env()
     for i in range(conf.num_episodes):
-        env = mazewandererenv.Env()
+        env.reset()
         obs, _, _, _ = env.render()
         obspac = np.array(obs["pacman"])
         s = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
