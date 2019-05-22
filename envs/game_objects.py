@@ -107,10 +107,12 @@ class PacMan(Entity):
         self.coins = coins
         self.ghosts = ghosts
         self.lost = False
+        self.reward = 0
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
         
     def update(self):
+        self.reward = 0
         # get keyboard inputs
         # subject to change with simulated env
         if self.action == self.ActionSpace.IDLE:
@@ -139,10 +141,9 @@ class PacMan(Entity):
         for c in self.coins:
             if pygame.sprite.collide_rect(self, c):
                 c.kill()
+                print("GOT REWARD YUHJUU")
                 self.points += 1
                 self.reward = 10
-            else:
-                self.reward = 0
         
         # check for collision with ghosts
         for g in self.ghosts:
