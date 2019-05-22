@@ -90,6 +90,15 @@ class Env:
         self.observation["ghosts"][1] = screen
         self.observation["ghosts"][2] = screen
 
+        # compute the distance to pacman per ghost
+        self.info["ghosts"][0] = np.sqrt(np.square(self.ghost.rect.topleft[0]-self.player.rect.topleft[0]) +
+                                        np.square(self.ghost.rect.topleft[1]-self.player.rect.topleft[1]))
+        self.info["ghosts"][1] = np.sqrt(np.square(self.ghost2.rect.topleft[0]-self.player.rect.topleft[0]) +
+                                        np.square(self.ghost2.rect.topleft[1]-self.player.rect.topleft[1]))
+        self.info["ghosts"][2] = np.sqrt(np.square(self.ghost3.rect.topleft[0]-self.player.rect.topleft[0]) +
+                                        np.square(self.ghost3.rect.topleft[1]-self.player.rect.topleft[1]))
+
+        # get the rewards per entity
         self.reward["pacman"] = self.player.reward
         self.reward["ghosts"][0] = self.ghost.reward
         self.reward["ghosts"][1] = self.ghost2.reward
