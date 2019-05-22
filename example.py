@@ -22,6 +22,4 @@ while 1:
     env.ghost.action = env.ghost.ActionSpace.DOWN
     env.ghost2.action = env.ghost2.ActionSpace.UP
     env.ghost3.action = env.ghost3.ActionSpace.IDLE
-    print(reward["pacman"])
-    if i == 10:
-        exit(1)
+    print(done)

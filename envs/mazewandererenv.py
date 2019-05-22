@@ -45,7 +45,7 @@ class Env:
         x = y = 0
         for row in self.level.string_representation:
             for col in row:
-                if col == "P":
+                if col == "P" and not (x, y) == self.player.rect.topleft:
                     Wall((x, y), self.platforms)
                 if col == " " and not (x, y) == self.player.rect.topleft:
                     Coin((x, y), self.coins)
@@ -128,7 +128,7 @@ class Env:
         self.reward["ghosts"][2] = self.ghost3.reward
 
         # todo: implement done=True for the case that the player has collected all coin
-        self.done = self.player.lost
+        self.done = self.player.lost or len(self.coins) == 0
 
         # add all information here which cannot be retrieved easily via the visual channel
         self.info["player"]["lives"] = self.player.lives
