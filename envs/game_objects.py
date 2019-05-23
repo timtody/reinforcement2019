@@ -17,38 +17,7 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
-
-
-class CameraAwareLayeredUpdates(pygame.sprite.LayeredUpdates):
-    def __init__(self, target, world_size):
-        super().__init__()
-        self.target = target
-        self.cam = pygame.Vector2(0, 0)
-        self.world_size = world_size
-        if self.target:
-            self.add(target)
-
-    def draw(self, surface):
-        spritedict = self.spritedict
-        surface_blit = surface.blit
-        dirty = self.lostsprites
-        self.lostsprites = []
-        dirty_append = dirty.append
-        init_rect = self._init_rect
-        for spr in self.sprites():
-            rec = spritedict[spr]
-            newrect = surface_blit(spr.image, spr.rect.move(self.cam))
-            if rec is init_rect:
-                dirty_append(newrect)
-            else:
-                if newrect.colliderect(rec):
-                    dirty_append(newrect.union(rec))
-                else:
-                    dirty_append(newrect)
-                    dirty_append(rec)
-            spritedict[spr] = newrect
-        return dirty
-
+    
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, *group):

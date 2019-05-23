@@ -22,4 +22,5 @@ while 1:
     env.ghost.action = env.ghost.ActionSpace.DOWN
     env.ghost2.action = env.ghost2.ActionSpace.UP
     env.ghost3.action = env.ghost3.ActionSpace.IDLE
-    print(done)
+    if done:
+        env.reset()
