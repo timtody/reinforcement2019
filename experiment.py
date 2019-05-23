@@ -100,8 +100,8 @@ def runExp(*args, **kwargs):
         logAvgRewardPerStep.append(rewardSum/numSteps)
     
     # Plot Results
-    plotter.pacmanAgentPerf(logRewardPerGame,
-                            logStepsPerGame, 
+    plotter.pacmanAgentPerf(logStepsPerGame,
+                            logRewardPerGame,
                             logAvgRewardPerStep)
 
 
