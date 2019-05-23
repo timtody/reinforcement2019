@@ -14,11 +14,11 @@ def runExp(*args, **kwargs):
     conf = defaultConfig()
     conf.addConfig(config.RapidConfig(*args, **kwargs))
     conf.generateDynamicEntries()
-    #inout.makeDir(conf.log_dir)
-    #inout.makeDir(conf.image_dir)
+    inout.makeDir(conf.log_dir)
+    inout.makeDir(conf.image_dir)
     print(conf)
-    #if conf.write_conf:
-    #    conf.writeConfigToDisk(conf.log_dir)
+    if conf.write_conf:
+        conf.writeConfigToDisk(conf.log_dir)
 
     # Setup Models
     pacModel, pacOptimizer = models.definePacmanTestModel1(pacmanNetConfig())
@@ -100,9 +100,13 @@ def runExp(*args, **kwargs):
         logAvgRewardPerStep.append(rewardSum/numSteps)
     
     # Plot Results
-    plotter.pacmanAgentPerf(logStepsPerGame,
+    plotter.pacmanAgentPerf(conf, 
+                            logStepsPerGame,
                             logRewardPerGame,
                             logAvgRewardPerStep)
+    
+    # Return Model
+    return pacModel
 
 
 

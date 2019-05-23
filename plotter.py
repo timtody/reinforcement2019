@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-def pacmanAgentPerf(stepsPerGame, rewardPerGame, avgRewardPerStep):
+def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame, avgRewardPerStep):
     x = list(range(1,len(stepsPerGame)+1))
     
     fig, ax1 = plt.subplots()
@@ -19,5 +19,9 @@ def pacmanAgentPerf(stepsPerGame, rewardPerGame, avgRewardPerStep):
     plt.xlabel("Game")
     plt.xlim((1,len(stepsPerGame)))
     
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + 'pacmanPerf.png')
 
-    plt.show()
+    if conf.show_plots:
+        plt.show()
+    

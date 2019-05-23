@@ -26,7 +26,7 @@ def defaultConfig():
     rc.timestamp = rc.getTimestamp()
 
     # Training parameters
-    rc.num_episodes = 20
+    rc.num_episodes = 1000
 
     # Random seed
     rc.random_seed = 1
