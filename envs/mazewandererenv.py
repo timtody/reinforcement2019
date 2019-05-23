@@ -37,7 +37,6 @@ class Env:
         self.init_playables()
         self.setup_level()
 
-        
     def setup_level(self, walls=True):
         level_width = len(self.level.string_representation[0])*self.TILE_SIZE
         level_height = len(self.level.string_representation)*self.TILE_SIZE
@@ -52,14 +51,21 @@ class Env:
                 x += self.TILE_SIZE
             y += self.TILE_SIZE
             x = 0
-        
 
     def init_playables(self):
         # playables
-        self.ghost = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*10, self.TILE_SIZE*10))
-        self.ghost2 = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*12, self.TILE_SIZE*12))
-        self.ghost3 = Ghost([self.ghosts, self.entities], self.platforms, (self.TILE_SIZE*14, self.TILE_SIZE*14))
-        self.player = PacMan([self.playables, self.entities], self.platforms, self.coins, self.ghosts, (self.TILE_SIZE*3, self.TILE_SIZE*3))
+        self.ghost = Ghost(
+            [self.ghosts, self.entities], self.platforms, 
+            (self.TILE_SIZE*10, self.TILE_SIZE*10))
+        self.ghost2 = Ghost(
+            [self.ghosts, self.entities], self.platforms, 
+            (self.TILE_SIZE*12, self.TILE_SIZE*12))
+        self.ghost3 = Ghost(
+            [self.ghosts, self.entities], self.platforms, 
+            (self.TILE_SIZE*14, self.TILE_SIZE*14))
+        self.player = PacMan(
+            [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
+            (self.TILE_SIZE*3, self.TILE_SIZE*3))
     
     def reset(self):
         # delete all current coins and players
@@ -119,4 +125,3 @@ class Env:
         self.info["player"]["lives"] = self.player.lives
 
         return self.observation, self.reward, self.done, self.info
-

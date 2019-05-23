@@ -166,5 +166,3 @@ class Ghost(Entity):
 
         # horizontal collision and movement
         self.move()
-
-        
