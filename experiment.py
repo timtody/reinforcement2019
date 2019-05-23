@@ -45,34 +45,23 @@ def runExp(*args, **kwargs):
                 a = np.random.randint(0, 5)
             else:
                 a = np.argmax(pacModel.predict(s))
-            #act here
-            if a == 0:
-                action = env.player.ActionSpace.IDLE
-            elif a == 1:
-                action = env.player.ActionSpace.UP
-            elif a == 2:
-                action = env.player.ActionSpace.DOWN
-            elif a == 3:
-                action = env.player.ActionSpace.LEFT
-            elif a == 4:
-                action = env.player.ActionSpace.RIGHT
-            env.player.action = action
+            env.player.action = env.player.ActionSpace(a+1)
             currentReward = 0
             for _ in range(9):
                 _, reward, _,_ = env.render()
                 currentReward += reward['pacman']
-            obs, reward, done, info = env.render()
+            nextObs, reward, done, info = env.render()
             currentReward += reward["pacman"]
             r = currentReward
-            obspac = np.array(obs["pacman"])
-            new_s = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
+            nextObs = np.array(nextObs["pacman"])
+            new_s = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
             target = r + y * np.max(pacModel.predict(new_s))
             target_vec = pacModel.predict(s)[0]
             target_vec[a] = target
             pacModel.fit(s, target_vec.reshape(-1, 5), epochs=1, verbose=0)
             s = new_s
             r_sum += r
-        r_avg_list.append(r_sum / 1000)
+        r_avg_list.append(r_sum / conf.num_episodes)
 
 
 
