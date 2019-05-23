@@ -19,6 +19,6 @@ rc.plot_after_training = True
 rc.show_plots = True
 
 # Run the experiment
-model = experiment.train(rc)
+model = experiment.runExp(rc)
 
 print('Done.')
