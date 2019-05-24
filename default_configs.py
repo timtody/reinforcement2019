@@ -12,7 +12,7 @@ def pacmanNetConfig():
     rc.input_x_dim = 576
     rc.input_y_dim = 640
     rc.c_channels = 1
-    rc.num_actions = 5
+    rc.num_actions = 4
 
     rc.optimizer = 'adadelta' # other options: 'sgd', 'adam', 'adagrad'
     rc.learning_rate = 1.0
@@ -27,6 +27,10 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 1000
+    
+    # Game Config
+    rc.level_name = 'Full' # Options: Full, Chaos, Race, Empty
+    rc.display_game = True
 
     # Random seed
     rc.random_seed = 1

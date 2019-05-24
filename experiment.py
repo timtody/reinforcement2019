@@ -21,7 +21,8 @@ def runExp(*args, **kwargs):
         conf.writeConfigToDisk(conf.log_dir)
 
     # Setup Models
-    pacModel, pacOptimizer = models.definePacmanTestModel1(pacmanNetConfig())
+    pacNetConf = pacmanNetConfig()
+    pacModel, pacOptimizer = models.definePacmanTestModel1(pacNetConf)
     pacModel.compile(optimizer=pacOptimizer, loss='mse')
     #pacModel.summary()
 
@@ -36,7 +37,7 @@ def runExp(*args, **kwargs):
     logStepsPerGame = []
     
     # Init Game Env
-    env = mazewandererenv.Env()
+    env = mazewandererenv.Env(levelName=conf.level_name)
 
     # Run
     for episodeNum in range(conf.num_episodes):
@@ -48,7 +49,7 @@ def runExp(*args, **kwargs):
         env.reset()
 
         # Get initial state
-        obs, _, _, _ = env.render()
+        obs, _, _, _ = env.render(update_display=conf.display_game)
         obspac = np.array(obs["pacman"])
         state = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
         
@@ -64,30 +65,30 @@ def runExp(*args, **kwargs):
         while not done:
             # Select Action (Epsilon-Greedy)
             if np.random.random() < eps:
-                action = np.random.randint(0, 5)
+                action = np.random.randint(0, pacNetConf.num_actions)
             else:
                 action = np.argmax(pacModel.predict(state))
             
             # Set action in Env
-            env.player.action = env.player.ActionSpace(action+1)
+            env.player.action = env.player.ActionSpace(action)
             
             # Step game and collect reward
             reward = 0
             for _ in range(9):
-                _, rewardRaw, _,_ = env.render()
+                _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
                 reward += rewardRaw['pacman']
-            nextObs, rewardRaw, done, info = env.render()
+            nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
             reward += rewardRaw["pacman"]
 
             # Unpack, Reshape & Set new state
-            nextObs = np.array(nextObs["pacman"])
+            nextObs = nextObs["pacman"]
             newState = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
 
             # Train Model
             target = reward + y * np.max(pacModel.predict(newState))
             target_vec = pacModel.predict(state)[0]
             target_vec[action] = target
-            pacModel.fit(state, target_vec.reshape(-1, 5), epochs=1, verbose=0)
+            pacModel.fit(state, target_vec.reshape(-1, pacNetConf.num_actions), epochs=1, verbose=0)
 
             # Prepare for next round
             state = newState
