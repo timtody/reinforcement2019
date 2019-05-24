@@ -77,7 +77,11 @@ class Env:
         self.init_playables()
         self.setup_level(walls=False)
 
-    def render(self):
+    
+    def draw_screen(self):
+        pass
+
+    def render(self, update_display=False):
         for e in pygame.event.get():
             if e.type == QUIT:
                 sys.exit()
@@ -86,19 +90,19 @@ class Env:
         False, (0, 0, 0))
         surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
         False, (0, 0, 0))
-        # entities.update()
+
         self.entities.update()
-        #platforms.update()
         self.screen.fill((0, 0, 0))
         self.entities.draw(self.screen)
         self.coins.draw(self.screen)
         self.entities.draw(self.screen)
         self.platforms.draw(self.screen)
-
+        
         # show points and lives
         self.screen.blit(surface_points,(0,17*32-10))
         self.screen.blit(surface_lives,(256,17*32-10))
-        pygame.display.update()
+        
+        if update_display: pygame.display.update()
 
         # setup return values for render
         screen = pygame.surfarray.array2d(self.screen).T
@@ -123,5 +127,8 @@ class Env:
         self.done = self.player.lost or len(self.coins) == 0
         # add all information here which cannot be retrieved easily via the visual channel
         self.info["player"]["lives"] = self.player.lives
+
+        # implement replay buffer
+        # batch_size x screen_h x screen_w
 
         return self.observation, self.reward, self.done, self.info
