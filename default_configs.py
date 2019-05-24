@@ -30,6 +30,7 @@ def defaultConfig():
     
     # Game Config
     rc.level_name = 'Full' # Options: Full, Chaos, Race, Empty
+    rc.display_game = True
 
     # Random seed
     rc.random_seed = 1

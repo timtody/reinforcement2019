@@ -48,7 +48,7 @@ def runExp(*args, **kwargs):
         env.reset()
 
         # Get initial state
-        obs, _, _, _ = env.render()
+        obs, _, _, _ = env.render(update_display=conf.display_game)
         obspac = np.array(obs["pacman"])
         state = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
         
@@ -74,9 +74,9 @@ def runExp(*args, **kwargs):
             # Step game and collect reward
             reward = 0
             for _ in range(9):
-                _, rewardRaw, _,_ = env.render()
+                _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
                 reward += rewardRaw['pacman']
-            nextObs, rewardRaw, done, info = env.render()
+            nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
             reward += rewardRaw["pacman"]
 
             # Unpack, Reshape & Set new state
