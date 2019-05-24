@@ -69,7 +69,7 @@ def runExp(*args, **kwargs):
                 action = np.argmax(pacModel.predict(state))
             
             # Set action in Env
-            env.player.action = env.player.ActionSpace(action+1)
+            env.player.action = env.player.ActionSpace(action)
             
             # Step game and collect reward
             reward = 0

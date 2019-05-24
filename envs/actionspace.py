@@ -1,8 +1,8 @@
 from enum import Enum, auto
 
 class ActionSpace(Enum):
-    UP = auto()
-    DOWN = auto()
-    LEFT = auto()
-    RIGHT = auto()
-    IDLE = auto()
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
+    IDLE = 4
