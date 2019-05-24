@@ -1,4 +1,24 @@
 class Level:
+    string_representation3 = [
+        "PPPPPPPPPPPPPPPPPPPP",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "P                  P",
+        "PPPPPPPPPPPPPPPPPPPP", ]
+
     string_representation = [
         "PPPPPPPPPPPPPPPPPPPP",
         "PPPPPPPPPPPPPPPPPPPP",
@@ -16,7 +36,7 @@ class Level:
         "PPP PPPPPPPPPPPPPPPP",
         "PPP PPPPPPPPPPPPPPPP",
         "PPP PPPPPPPPPPPPPPPP",
-        "PPPPPPPPPPPPPPPPPPPP",
+        "PPP PPPPPPPPPPPPPPPP",
         "PPPPPPPPPPPPPPPPPPPP", ]
 
     string_representation2 = [
