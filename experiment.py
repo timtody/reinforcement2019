@@ -21,7 +21,8 @@ def runExp(*args, **kwargs):
         conf.writeConfigToDisk(conf.log_dir)
 
     # Setup Models
-    pacModel, pacOptimizer = models.definePacmanTestModel1(pacmanNetConfig())
+    pacNetConf = pacmanNetConfig()
+    pacModel, pacOptimizer = models.definePacmanTestModel1(pacNetConf)
     pacModel.compile(optimizer=pacOptimizer, loss='mse')
     #pacModel.summary()
 
@@ -64,7 +65,7 @@ def runExp(*args, **kwargs):
         while not done:
             # Select Action (Epsilon-Greedy)
             if np.random.random() < eps:
-                action = np.random.randint(0, 5)
+                action = np.random.randint(0, pacNetConf.num_actions)
             else:
                 action = np.argmax(pacModel.predict(state))
             
@@ -87,7 +88,7 @@ def runExp(*args, **kwargs):
             target = reward + y * np.max(pacModel.predict(newState))
             target_vec = pacModel.predict(state)[0]
             target_vec[action] = target
-            pacModel.fit(state, target_vec.reshape(-1, 5), epochs=1, verbose=0)
+            pacModel.fit(state, target_vec.reshape(-1, pacNetConf.num_actions), epochs=1, verbose=0)
 
             # Prepare for next round
             state = newState
