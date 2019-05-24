@@ -10,7 +10,7 @@ while 1:
     obs, reward, done, info = env.render()
 
     # display what MazeWanderer sees
-    plt.imshow(obs["ghosts"][0])
+    print(type(obs["ghosts"][0]))
     plt.show()
     
     # pacman und ghosts have  ActionSpace = IDLE, UP, DOWN, LEFT, RIGHT
@@ -23,5 +23,4 @@ while 1:
     env.ghost2.action = env.ghost2.ActionSpace.UP
     env.ghost3.action = env.ghost3.ActionSpace.IDLE
     if done:
-        
         env.reset()

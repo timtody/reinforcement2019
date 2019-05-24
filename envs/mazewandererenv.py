@@ -77,10 +77,6 @@ class Env:
         self.init_playables()
         self.setup_level(walls=False)
 
-    
-    def draw_screen(self):
-        pass
-
     def render(self, update_display=False):
         for e in pygame.event.get():
             if e.type == QUIT:
@@ -97,7 +93,7 @@ class Env:
         self.coins.draw(self.screen)
         self.entities.draw(self.screen)
         self.platforms.draw(self.screen)
-        
+
         # show points and lives
         self.screen.blit(surface_points,(0,17*32-10))
         self.screen.blit(surface_lives,(256,17*32-10))
