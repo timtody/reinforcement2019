@@ -8,7 +8,7 @@ from .configs import BaseConfig
 from .level import Level
 
 class Env:
-    def __init__(self, config=BaseConfig, levelName):
+    def __init__(self, config=BaseConfig, levelName='Full'):
         pygame.init()
         pygame.font.init()
         # config
