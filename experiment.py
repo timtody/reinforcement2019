@@ -80,7 +80,7 @@ def runExp(*args, **kwargs):
             reward += rewardRaw["pacman"]
 
             # Unpack, Reshape & Set new state
-            nextObs = np.array(nextObs["pacman"])
+            nextObs = nextObs["pacman"]
             newState = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
 
             # Train Model
