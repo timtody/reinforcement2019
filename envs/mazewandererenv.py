@@ -8,7 +8,7 @@ from .configs import BaseConfig
 from .level import Level
 
 class Env:
-    def __init__(self, config=BaseConfig, level=Level):
+    def __init__(self, config=BaseConfig, levelName):
         pygame.init()
         pygame.font.init()
         # config
@@ -18,7 +18,7 @@ class Env:
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
         self.screen = pygame.display.set_mode(self.SCREEN_SIZE.size)
         self.timer = pygame.time.Clock()
-        self.level = level
+        self.level = Level(levelName)
         
         # sprite groups
         self.playables = pygame.sprite.Group()

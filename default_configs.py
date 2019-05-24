@@ -27,6 +27,9 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 1000
+    
+    # Game Config
+    rc.level_name = 'Full' # Options: Full, Chaos, Race, Empty
 
     # Random seed
     rc.random_seed = 1

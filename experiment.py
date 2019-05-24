@@ -36,7 +36,7 @@ def runExp(*args, **kwargs):
     logStepsPerGame = []
     
     # Init Game Env
-    env = mazewandererenv.Env()
+    env = mazewandererenv.Env(levelName=conf.level_name)
 
     # Run
     for episodeNum in range(conf.num_episodes):
