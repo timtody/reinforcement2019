@@ -69,7 +69,7 @@ class PacMan(Entity):
         self.image, self.rect = load_image('pacman.png')
         self.start = pos
         self.rect.topleft = pos
-        self.movespeed = 3
+        self.movespeed = 32
         self.hsp = 0
         self.vsp = 0
         self.platforms = platforms

@@ -69,14 +69,18 @@ def runExp(*args, **kwargs):
             else:
                 action = np.argmax(pacModel.predict(state))
             
-            # Set action in Env
+            # Set actions in Env
             env.player.action = env.player.ActionSpace(action)
+            # Random Ghosts
+            env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
+            env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
+            env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
             # Step game and collect reward
             reward = 0
-            for _ in range(9):
-                _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
-                reward += rewardRaw['pacman']
+            #for _ in range(9):
+            #    _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
+            #    reward += rewardRaw['pacman']
             nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
             reward += rewardRaw["pacman"]
 

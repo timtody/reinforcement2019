@@ -56,16 +56,16 @@ class Env:
         # playables
         self.ghost = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*10, self.TILE_SIZE*10))
+            (self.TILE_SIZE*9, self.TILE_SIZE*9))
         self.ghost2 = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*12, self.TILE_SIZE*12))
+            (self.TILE_SIZE*9, self.TILE_SIZE*9))
         self.ghost3 = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*14, self.TILE_SIZE*14))
+            (self.TILE_SIZE*0, self.TILE_SIZE*9))
         self.player = PacMan(
             [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
-            (self.TILE_SIZE*3, self.TILE_SIZE*3))
+            (self.TILE_SIZE*3, self.TILE_SIZE*2))
     
     def reset(self):
         # delete all current coins and players

@@ -92,3 +92,24 @@ class Level:
             "P                  P",
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
+
+        # Full Level - Single Tracks Only
+        self.levelDict['FullSingle'] = [
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PP                PP",
+            "PPP PPPPP PPPPPPP PP",
+            "PP                PP",
+            "PP P PPPPPPPPPP P PP",
+            "PP P            P PP",
+            "PP P P PPPPPP P P PP",
+            "PP   P P    P P P PP",
+            "PP P P P    P P   PP",
+            "PP P P PP  PP P P PP",
+            "PP P            P PP",
+            "PP P PPPPPPPPPP P PP",
+            "PP                PP",
+            "PP PPPPPPP PPPPPP PP",
+            "PP                PP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP", ]
