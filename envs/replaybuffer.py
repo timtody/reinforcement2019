@@ -44,11 +44,11 @@ class ReplayBuffer:
             top_indices = batch_size - tail_indices
             tail_data = self.obs_buffer[self.read_idx:]
             top_data = self.obs_buffer[:top_indices]
-            action = np.concatenate(self.action_buffer[self.read_idx:],self.action_buffer[:top_indices])
-            reward = np.concatenate(self.reward_buffer[self.read_idx:],self.reward_buffer[:top_indices])
+            action = np.concatenate((self.action_buffer[self.read_idx:],self.action_buffer[:top_indices]))
+            reward = np.concatenate((self.reward_buffer[self.read_idx:],self.reward_buffer[:top_indices]))
             self.read_idx = top_indices
 
-            return np.stack(tail_data, top_data), reward, action
+            return np.stack((tail_data, top_data)), reward, action
 
     def shuffle(self):
         perm = np.random.permutation(self.current_buffer_size)

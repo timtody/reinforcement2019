@@ -32,4 +32,5 @@ while 1:
 
 buf.shuffle()
 obs, reward, action = buf.next_batch(2)
+obs, reward, action = buf.next_batch(2)
 print(obs.shape, reward.shape, action)
