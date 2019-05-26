@@ -29,7 +29,7 @@ class ReplayBuffer:
             self.obs_buffer[self.write_idx] = observation
             self.reward_buffer[self.write_idx] = reward
             self.action_buffer[self.write_idx] = action
-            self.write_idx += 1
+            self.write_idx = self.write_idx % (self.max_buffer_size + 1)
 
     def next_batch(self, batch_size):
         if self.read_idx + batch_size <= self.max_buffer_size:
