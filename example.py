@@ -23,7 +23,7 @@ while 1:
     # put observations into replay buffer
     # momentan nur die action vom player
     buf.append(obs["pacman"], reward, env.player.action)
-    if i == 3:
+    if i == 9:
         break
 
     i += 1

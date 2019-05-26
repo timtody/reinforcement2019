@@ -42,13 +42,11 @@ class ReplayBuffer:
         else:
             tail_indices = batch_size - (self.max_buffer_size - self.read_idx)
             top_indices = batch_size - tail_indices
-            tail_range = range(self.read_idx + tail_indices)
-            top_range = range(0, top_indices[-1])
-            tail_data = np.take(self.obs_buffer, tail_range, axis=0)
-            top_data = np.take(self.obs_buffer, top_range, axis=0)
+            tail_data = self.obs_buffer[self.read_idx:]
+            top_data = self.obs_buffer[:top_indices]
+            action = np.concatenate(self.action_buffer[self.read_idx:],self.action_buffer[:top_indices])
+            reward = np.concatenate(self.reward_buffer[self.read_idx:],self.reward_buffer[:top_indices])
             self.read_idx = top_indices
-            action = np.concatenate(self.action_buffer[tail_range],self.action_buffer[top_range])
-            reward = np.concatenate(self.reward_buffer[tail_range],self.reward_buffer[top_range])
 
             return np.stack(tail_data, top_data), reward, action
 
