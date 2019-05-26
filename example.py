@@ -1,9 +1,9 @@
 from envs import mazewandererenv
-from replaybuffer import ReplayBuffer
+from envs import replaybuffer
 from matplotlib import pyplot as plt
 
 env = mazewandererenv.Env()
-buf = ReplayBuffer(max_buffer_size = 3)
+buf = replaybuffer.ReplayBuffer(max_buffer_size = 3)
 
 i = 0
 while 1:
