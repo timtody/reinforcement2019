@@ -1,4 +1,5 @@
 import numpy as np
+from time import time
 
 from library import inout, config, models
 from default_configs import defaultConfig, pacmanNetConfig
@@ -16,7 +17,6 @@ def runExp(*args, **kwargs):
     conf.generateDynamicEntries()
     inout.makeDir(conf.log_dir)
     inout.makeDir(conf.image_dir)
-    print(conf)
     if conf.write_conf:
         conf.writeConfigToDisk(conf.log_dir)
 
@@ -33,18 +33,17 @@ def runExp(*args, **kwargs):
 
     # Init Logs # Todo: replace with preallocated arrays 
     logRewardPerGame = []
-    logAvgRewardPerStep = []
     logStepsPerGame = []
+    logAvgStepTime = []
+    logAvgTrainTime = []
     
     # Init Game Env
     env = mazewandererenv.Env(levelName=conf.level_name)
 
     # Run
+    print("Training...")
+    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.2f}s"
     for episodeNum in range(conf.num_episodes):
-        # Print Status
-        if episodeNum % 10 == 0:
-            print("Episode {} of {}".format(episodeNum, conf.num_episodes))
-
         # Reset Game Env
         env.reset()
 
@@ -60,6 +59,8 @@ def runExp(*args, **kwargs):
         done = False
         rewardSum = 0
         numSteps = 0
+        timeStepGame = 0
+        timeTrain = 0
 
         # One Game
         while not done:
@@ -77,38 +78,57 @@ def runExp(*args, **kwargs):
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
             # Step game and collect reward
+            startTime = time()
             reward = 0
             #for _ in range(9):
             #    _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
             #    reward += rewardRaw['pacman']
             nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
             reward += rewardRaw["pacman"]
+            timeStepGame += time()-startTime
 
             # Unpack, Reshape & Set new state
             nextObs = nextObs["pacman"]
             newState = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
 
             # Train Model
+            startTime = time()
             target = reward + y * np.max(pacModel.predict(newState))
             target_vec = pacModel.predict(state)[0]
             target_vec[action] = target
             pacModel.fit(state, target_vec.reshape(-1, pacNetConf.num_actions), epochs=1, verbose=0)
+            timeTrain += time()-startTime
 
             # Prepare for next round
             state = newState
+
+            # Logging
             numSteps += 1
             rewardSum += reward
         
         # Log
         logStepsPerGame.append((numSteps))
         logRewardPerGame.append(rewardSum)
-        logAvgRewardPerStep.append(rewardSum/numSteps)
+        logAvgStepTime.append(timeStepGame/numSteps)
+        logAvgTrainTime.append(timeTrain/numSteps)
+
+        # Print some Status info
+        print(statusOut.format(episodeNum+1,
+                               conf.num_episodes,
+                               numSteps,
+                               rewardSum,
+                               timeStepGame/numSteps,
+                               timeTrain/numSteps))
+
+
     
     # Plot Results
     plotter.pacmanAgentPerf(conf, 
                             logStepsPerGame,
-                            logRewardPerGame,
-                            logAvgRewardPerStep)
+                            logRewardPerGame)
+    plotter.times(conf,
+                  logAvgStepTime, 
+                  logAvgTrainTime)
     
     # Return Model
     return pacModel

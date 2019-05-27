@@ -1,22 +1,20 @@
 from matplotlib import pyplot as plt
 
-def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame, avgRewardPerStep):
+def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame):
     x = list(range(1,len(stepsPerGame)+1))
     
     fig, ax1 = plt.subplots()
     
     ax1.plot(x, rewardPerGame)
-    ax1.plot(x, avgRewardPerStep)
     ax1.set_ylabel('Reward')
-    plt.legend(["Total Reward", "Avg. Reward per Step"])
+    ax1.set_xlabel("Game")
 
     ax2 = ax1.twinx()
-    ax2.plot(x, stepsPerGame, 'b')
-    ax2.set_ylabel('Steps', color='b')
-    ax2.tick_params('y', colors='b')
+    ax2.plot(x, stepsPerGame, 'orangered')
+    ax2.set_ylabel('Steps', color='orangered')
+    ax2.tick_params(colors='orangered')
     
     plt.title("Performance: Pacman Agent")
-    plt.xlabel("Game")
     plt.xlim((1,len(stepsPerGame)))
     
     if conf.save_plots:
@@ -25,3 +23,18 @@ def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame, avgRewardPerStep):
     if conf.show_plots:
         plt.show()
     
+def times(conf, avgStepTime, avgTrainTime):
+    x = list(range(1,len(avgStepTime)+1))
+
+    plt.plot(avgStepTime)
+    plt.plot(avgTrainTime)
+    plt.legend(["Avg. Time per Game Step", "Avg. Time per Fit"])
+    plt.title("Times")
+    plt.ylabel("time[s]")
+    plt.xlabel("Game")
+
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + 'times.png')
+
+    if conf.show_plots:
+        plt.show()
