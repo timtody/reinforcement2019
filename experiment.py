@@ -105,7 +105,7 @@ def runExp(*args, **kwargs):
     # Plot Results
     plotter.pacmanAgentPerf(conf, 
                             logStepsPerGame,
-                            logRewardPerGame)
+                            pacman.rewardLog)
     plotter.times(conf,
                   logAvgStepTime, 
                   logAvgTrainTime)
