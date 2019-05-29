@@ -17,6 +17,7 @@ class Agent():
         if printSummary:
             self.model.summary()
         self.eps = self.agentConf.eps
+        self.trainDelay = self.agentConf.num_train_after_experiences
     
     def __initBuffers(self):
         self.trainBuffer = ReplayBuffer(self.agentConf.replay_buffer_size)
@@ -47,11 +48,34 @@ class Agent():
         self.eps *= self.agentConf.decay_factor
     
     def trainWithSinglePair(self, state, newState, action, reward):
+        # Reshape states to fit network
         state = np.reshape(state, (1,state.shape[0],state.shape[1],1))
         newState = np.reshape(state, (1,newState.shape[0], newState.shape[1],1))
+
         target = reward + self.agentConf.y * np.max(self.model.predict(newState))
-        target_vec = self.model.predict(state)[0]
+        targetVec = self.model.predict(state)[0]
 
-        target_vec[action] = target
-        self.model.fit(state, target_vec.reshape(-1, self.agentConf.num_actions), epochs=1, verbose=0)
+        targetVec[action] = target
+        trainTarget = targetVec.reshape(-1, self.agentConf.num_actions) # shape from (num_action,) to (1,num_action)
+        self.model.fit(state, trainTarget, epochs=1, verbose=0)
 
+    def train(self):
+        while not self.trainBuffer.roundDone:
+            # Workaround for broken buffer / Get next batch
+            stateBatch, rewardBatch, actionBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
+            newStateBatch, _, _ = self.trainBufferB.next_batch(self.agentConf.train_batch_size)
+
+            # Make batched predicitons
+            predStates = self.model.predict(stateBatch)
+            predNewStates = self.model.predict(newStateBatch)
+
+            # Calculate Targets
+            targetRewards = rewardBatch + self.agentConf.y * np.max(predNewStates, axis=1)
+            trainTargets = predStates
+            for i in range(0,len(actionBatch)):
+                trainTargets[i,actionBatch[i]] = targetRewards[i]
+
+            # Train model
+            self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+        # Reset Buffers
+        __initBuffers() # ToDo: Replace by reset to index 0

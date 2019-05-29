@@ -24,6 +24,7 @@ def runExp(*args, **kwargs):
     logStepsPerGame = []
     logAvgStepTime = []
     logAvgTrainTime = []
+    sumExperiences = 0
     
     # Init Game Env
     env = mazewandererenv.Env(levelName=conf.level_name)
@@ -33,19 +34,17 @@ def runExp(*args, **kwargs):
 
     # Run
     print("Training...")
-    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.2f}s"
+    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
     for episodeNum in range(conf.num_episodes):
         # Reset Game Env
         env.reset()
 
         # Get initial state
-        obs, _, _, _ = env.render(update_display=conf.display_game)
-        obspac = np.array(obs["pacman"])
-        state = np.reshape(obspac, (obspac.shape[0],obspac.shape[1],1))
+        state, _, _, _ = stepEnv(conf, env)
         
         # (Re-)set game vars
         done = False
-        numSteps = 0
+        sumGameSteps = 0
         timeStepGame = 0
         timeTrain = 0
 
@@ -53,9 +52,8 @@ def runExp(*args, **kwargs):
         while not done:
             # Select Action (Epsilon-Greedy)
             action = pacman.getAction(state)
-            
-            # Set actions in Env
             env.player.action = env.player.ActionSpace(action)
+            
             # Random Ghosts
             env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
@@ -63,39 +61,38 @@ def runExp(*args, **kwargs):
             
             # Step game and collect reward
             startTime = time()
-            nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
-            reward = rewardRaw["pacman"]
+            newState, reward, done, info = stepEnv(conf, env)
             timeStepGame += time()-startTime
-
-            # Unpack, Reshape & Set new state
-            nextObs = nextObs["pacman"]
-            newState = np.reshape(nextObs, (nextObs.shape[0], nextObs.shape[1],1))
 
             # Train Model
             startTime = time()
-            pacman.storeExperience(state, newState, action, reward)
             pacman.trainWithSinglePair(state, newState, action, reward)
-            #trainModel(pacModel, trainBuffer,trainBufferB, state, newState, action, reward)
+            pacman.storeExperience(state, newState, action, reward)
+            if (sumExperiences +1) % pacman.trainDelay == 0:
+                print('Performing a training step..')
+                #pacman.train()
+            
             timeTrain += time()-startTime
 
             # Prepare for next round
             state = newState
 
             # Logging
-            numSteps += 1
+            sumGameSteps += 1
+            sumExperiences += 1
         
         # Log
-        logStepsPerGame.append((numSteps))
-        logAvgStepTime.append(timeStepGame/numSteps)
-        logAvgTrainTime.append(timeTrain/numSteps)
+        logStepsPerGame.append((sumGameSteps))
+        logAvgStepTime.append(timeStepGame/sumGameSteps)
+        logAvgTrainTime.append(timeTrain/sumGameSteps)
 
         # Print some Status info
         print(statusOut.format(episodeNum+1,
                                conf.num_episodes,
-                               numSteps,
+                               sumGameSteps,
                                pacman.rewardSum,
-                               timeStepGame/numSteps,
-                               timeTrain/numSteps))
+                               timeStepGame/sumGameSteps,
+                               timeTrain/sumGameSteps))
         
         # Prepare agents for next game round
         pacman.prepForNextGame()
@@ -113,7 +110,14 @@ def runExp(*args, **kwargs):
     # Return Handles for Debugging
     return pacman, conf
 
-
+def stepEnv(conf, env):
+    obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
+    #from matplotlib import pyplot as plt
+    #plt.imshow(display)
+    #plt.show()
+    reward = rewardRaw["pacman"]
+    state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
+    return state, reward, done, info
 
 if __name__ == "__main__":
     runExp()
