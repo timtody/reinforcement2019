@@ -9,8 +9,8 @@ def pacmanNetConfig():
     rc = RapidConfig()
 
     # Network input/output shape
-    rc.input_x_dim = 576
-    rc.input_y_dim = 640
+    rc.input_x_dim = 72
+    rc.input_y_dim = 80
     rc.c_channels = 1
     rc.num_actions = 4
 
@@ -22,7 +22,9 @@ def pacmanNetConfig():
     rc.eps = 0.5
     rc.decay_factor = 0.999
 
-    rc.replay_buffer_size = 50
+    rc.replay_buffer_size = 100
+    rc.train_batch_size = 50
+    rc.num_train_after_experiences = 100
 
     return rc
 

@@ -6,6 +6,7 @@ from .game_objects import *
 from .actionspace import ActionSpace
 from .configs import BaseConfig
 from .level import Level
+from PIL import Image
 
 class Env:
     def __init__(self, config=BaseConfig, levelName='Full'):
@@ -101,7 +102,8 @@ class Env:
         if update_display: pygame.display.update()
 
         # setup return values for render
-        screen = pygame.surfarray.array2d(self.screen).T
+        screenRaw = pygame.surfarray.array2d(self.screen).T
+        screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
         screen = screen/np.max(screen)
         self.observation["pacman"] = screen
         self.observation["ghosts"][0] = screen
@@ -127,4 +129,4 @@ class Env:
         # implement replay buffer
         # batch_size x screen_h x screen_w
 
-        return self.observation, self.reward, self.done, self.info
+        return self.observation, self.reward, self.done, self.info, screenRaw
