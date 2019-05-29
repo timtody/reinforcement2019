@@ -38,7 +38,7 @@ def defaultConfig():
     rc.num_episodes = 1000
     
     # Game Config
-    rc.level_name = 'Full' # Options: Full, Chaos, Race, Empty
+    rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty
     rc.display_game = True
 
     # Random seed
