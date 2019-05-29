@@ -22,7 +22,7 @@ def pacmanNetConfig():
     rc.eps = 0.5
     rc.decay_factor = 0.999
 
-    rc.replayBufferSize = 50
+    rc.replay_buffer_size = 50
 
     return rc
 

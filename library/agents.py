@@ -1,4 +1,5 @@
 from envs.replaybuffer import ReplayBuffer
+from library import models
 import numpy as np
 
 class Agent():
@@ -35,6 +36,7 @@ class Agent():
         return action
     
     def storeExperience(self, oldState, newState, action, reward):
+        self.rewardSum += reward
         self.trainBuffer.append(oldState, reward, action)
         self.trainBufferB.append(newState, reward, action)
 
@@ -44,7 +46,9 @@ class Agent():
         # Decay Epsilon
         self.eps *= self.agentConf.decay_factor
     
-    def trainWithSinglePair(state, newState, action, reward):
+    def trainWithSinglePair(self, state, newState, action, reward):
+        state = np.reshape(state, (1,state.shape[0],state.shape[1],1))
+        newState = np.reshape(state, (1,newState.shape[0], newState.shape[1],1))
         target = reward + self.agentConf.y * np.max(self.model.predict(newState))
         target_vec = self.model.predict(state)[0]
 

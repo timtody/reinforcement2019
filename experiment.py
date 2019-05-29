@@ -1,7 +1,7 @@
 import numpy as np
 from time import time
 
-from library import inout, config, models, agents
+from library import inout, config, agents
 from default_configs import defaultConfig, pacmanNetConfig
 import plotter
 
@@ -73,6 +73,7 @@ def runExp(*args, **kwargs):
 
             # Train Model
             startTime = time()
+            pacman.storeExperience(state, newState, action, reward)
             pacman.trainWithSinglePair(state, newState, action, reward)
             #trainModel(pacModel, trainBuffer,trainBufferB, state, newState, action, reward)
             timeTrain += time()-startTime
