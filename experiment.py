@@ -68,9 +68,9 @@ def runExp(*args, **kwargs):
             startTime = time()
             pacman.trainWithSinglePair(state, newState, action, reward)
             pacman.storeExperience(state, newState, action, reward)
-            if (sumExperiences +1) % pacman.trainDelay == 0:
-                print('Performing a training step..')
-                #pacman.train()
+            #if (sumExperiences +1) % pacman.trainDelay == 0:
+            #    pacman.train()
+            #    print('Performed a training step in',time()-startTime,'seconds.')
             
             timeTrain += time()-startTime
 

@@ -60,10 +60,12 @@ class Agent():
         self.model.fit(state, trainTarget, epochs=1, verbose=0)
 
     def train(self):
-        while not self.trainBuffer.roundDone:
+        done = False
+        self.trainBuffer.resetReadIndex()
+        while not done:
             # Workaround for broken buffer / Get next batch
-            stateBatch, rewardBatch, actionBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
-            newStateBatch, _, _ = self.trainBufferB.next_batch(self.agentConf.train_batch_size)
+            stateBatch, rewardBatch, actionBatch, done = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
+            newStateBatch, _, _, _ = self.trainBufferB.next_batch(self.agentConf.train_batch_size)
 
             # Make batched predicitons
             predStates = self.model.predict(stateBatch)
@@ -78,4 +80,4 @@ class Agent():
             # Train model
             self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
         # Reset Buffers
-        __initBuffers() # ToDo: Replace by reset to index 0
+        self.__initBuffers() # ToDo: Remove when buffer code is updated
