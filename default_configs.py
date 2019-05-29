@@ -36,6 +36,7 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 1000
+    rc.max_steps_per_game = 1500
     
     # Game Config
     rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty

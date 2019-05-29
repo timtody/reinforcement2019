@@ -80,6 +80,10 @@ def runExp(*args, **kwargs):
             # Logging
             sumGameSteps += 1
             sumExperiences += 1
+
+            # Break if max steps reached
+            if sumGameSteps == conf.max_steps_per_game:
+                done = True
         
         # Log
         logStepsPerGame.append((sumGameSteps))
