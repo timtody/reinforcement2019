@@ -1,11 +1,11 @@
 import numpy as np
 from time import time
 
-from library import inout, config, models
+from library import inout, config, models, agents
 from default_configs import defaultConfig, pacmanNetConfig
 import plotter
 
-from envs import mazewandererenv
+from envs import mazewandererenv, replaybuffer
 
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
@@ -20,25 +20,16 @@ def runExp(*args, **kwargs):
     if conf.write_conf:
         conf.writeConfigToDisk(conf.log_dir)
 
-    # Setup Models
-    pacNetConf = pacmanNetConfig()
-    pacModel, pacOptimizer = models.definePacmanTestModel1(pacNetConf)
-    pacModel.compile(optimizer=pacOptimizer, loss='mse')
-    #pacModel.summary()
-
-    # Q-Learning Params
-    y = 0.95
-    eps = 0.5
-    decay_factor = 0.999
-
     # Init Logs # Todo: replace with preallocated arrays 
-    logRewardPerGame = []
     logStepsPerGame = []
     logAvgStepTime = []
     logAvgTrainTime = []
     
     # Init Game Env
     env = mazewandererenv.Env(levelName=conf.level_name)
+
+    # Init Agents
+    pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman')
 
     # Run
     print("Training...")
@@ -50,14 +41,10 @@ def runExp(*args, **kwargs):
         # Get initial state
         obs, _, _, _ = env.render(update_display=conf.display_game)
         obspac = np.array(obs["pacman"])
-        state = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
-        
-        # Decay Epsilon
-        eps *= decay_factor
+        state = np.reshape(obspac, (obspac.shape[0],obspac.shape[1],1))
         
         # (Re-)set game vars
         done = False
-        rewardSum = 0
         numSteps = 0
         timeStepGame = 0
         timeTrain = 0
@@ -65,10 +52,7 @@ def runExp(*args, **kwargs):
         # One Game
         while not done:
             # Select Action (Epsilon-Greedy)
-            if np.random.random() < eps:
-                action = np.random.randint(0, pacNetConf.num_actions)
-            else:
-                action = np.argmax(pacModel.predict(state))
+            action = pacman.getAction(state)
             
             # Set actions in Env
             env.player.action = env.player.ActionSpace(action)
@@ -79,24 +63,18 @@ def runExp(*args, **kwargs):
             
             # Step game and collect reward
             startTime = time()
-            reward = 0
-            #for _ in range(9):
-            #    _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
-            #    reward += rewardRaw['pacman']
             nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
-            reward += rewardRaw["pacman"]
+            reward = rewardRaw["pacman"]
             timeStepGame += time()-startTime
 
             # Unpack, Reshape & Set new state
             nextObs = nextObs["pacman"]
-            newState = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
+            newState = np.reshape(nextObs, (nextObs.shape[0], nextObs.shape[1],1))
 
             # Train Model
             startTime = time()
-            target = reward + y * np.max(pacModel.predict(newState))
-            target_vec = pacModel.predict(state)[0]
-            target_vec[action] = target
-            pacModel.fit(state, target_vec.reshape(-1, pacNetConf.num_actions), epochs=1, verbose=0)
+            pacman.trainWithSinglePair(state, newState, action, reward)
+            #trainModel(pacModel, trainBuffer,trainBufferB, state, newState, action, reward)
             timeTrain += time()-startTime
 
             # Prepare for next round
@@ -104,11 +82,9 @@ def runExp(*args, **kwargs):
 
             # Logging
             numSteps += 1
-            rewardSum += reward
         
         # Log
         logStepsPerGame.append((numSteps))
-        logRewardPerGame.append(rewardSum)
         logAvgStepTime.append(timeStepGame/numSteps)
         logAvgTrainTime.append(timeTrain/numSteps)
 
@@ -116,9 +92,12 @@ def runExp(*args, **kwargs):
         print(statusOut.format(episodeNum+1,
                                conf.num_episodes,
                                numSteps,
-                               rewardSum,
+                               pacman.rewardSum,
                                timeStepGame/numSteps,
                                timeTrain/numSteps))
+        
+        # Prepare agents for next game round
+        pacman.prepForNextGame()
 
 
     
@@ -130,8 +109,8 @@ def runExp(*args, **kwargs):
                   logAvgStepTime, 
                   logAvgTrainTime)
     
-    # Return Model
-    return pacModel
+    # Return Handles for Debugging
+    return pacman, conf
 
 
 

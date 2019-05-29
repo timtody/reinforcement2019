@@ -17,6 +17,13 @@ def pacmanNetConfig():
     rc.optimizer = 'adadelta' # other options: 'sgd', 'adam', 'adagrad'
     rc.learning_rate = 1.0
 
+    # Q-Learning Parameters
+    rc.y = 0.95
+    rc.eps = 0.5
+    rc.decay_factor = 0.999
+
+    rc.replayBufferSize = 50
+
     return rc
 
 #### Experiment Configs
