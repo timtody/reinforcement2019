@@ -1,72 +1,121 @@
-import numpy as np
+import numpy as np 
 
-# ToDo & Bugs:
-# - Extra dimension appears when using next_batch at end of buffer
-# - Buffer tuple should be (state, newState, action, reward)
-# - 
 
 class ReplayBuffer:
-    def __init__(self, max_buffer_size = 500):
-        self.action_buffer = None
-        self.reward_buffer = None
-        self.obs_buffer = None
+    def __init__(self, observation_shape, max_buffer_size=500):
+        """Initializes buffer which stores a tuple of observations
+           containing old_state, new_state, action, reward of arbitrary sizes
+        
+        Arguments:
+            observation_shape {tuple} -- must be of shape (observation_dim0 x observation_dim1)
+            i.e. just pass observation.shape here
+        
+        Keyword Arguments:
+            max_buffer_size {int} -- maximum size of the buffer (default: {500})
+        """
         self.max_buffer_size = max_buffer_size
-        self.current_buffer_size = 0
-        self.first = True
+        self.old_state = np.empty(shape=(max_buffer_size, *observation_shape))
+        self.new_state = np.empty(shape=(max_buffer_size, *observation_shape))
+        self.action = np.empty(max_buffer_size)
+        self.reward = np.empty(max_buffer_size)
         self.read_idx = 0
         self.write_idx = 0
-        # ToDo: Allocate full size of buffer at start
+        self.empty = True
+        self.full = False
     
-    def append(self, observation, reward, action):
-        if self.current_buffer_size < self.max_buffer_size:
-            if self.first:
-                self.obs_buffer = np.expand_dims(observation, axis=0)
-                self.reward_buffer = reward
-                self.action_buffer = action
-                self.first = False
-            else:
-                observation = np.expand_dims(observation, axis=0)
-                self.obs_buffer = np.concatenate((self.obs_buffer, observation), axis=0)
-                self.reward_buffer = np.append(self.reward_buffer, reward)
-                self.action_buffer = np.append(self.action_buffer, action)
-            self.current_buffer_size += 1
-        else:
-            self.obs_buffer[self.write_idx] = observation
-            self.reward_buffer[self.write_idx] = reward
-            self.action_buffer[self.write_idx] = action
-            self.write_idx = self.write_idx % (self.max_buffer_size + 1)
-
+    def append(self, old_state, new_state, action, reward):
+        """Appends a single batch to the buffer. old_state and
+           new_state must be of the size specified in the 
+           constructor.
+        
+        Arguments:
+            old_state {array-like}
+            new_state {array-like}
+            reward {int}
+            action {int}
+        
+        Returns:
+            full bool -- True, if buffer.wirte_idx >= 500
+        """
+        if self.write_idx >= self.max_buffer_size:
+            self.full = True
+            # wrap around the buffer and set full flag to true
+            self.write_idx = 0
+        # append values to buffers
+        self.old_state[self.write_idx] = old_state
+        self.new_state[self.write_idx] = new_state
+        self.action[self.write_idx] = action
+        self.reward[self.write_idx] = reward
+        self.write_idx += 1
+        # set empty flag to False every time we write
+        self.empty = False
+            
+        return self.full
+    
     def next_batch(self, batch_size):
-        done = True # ToDo: true only if one round through buffer completed
-        if self.read_idx + batch_size <= self.max_buffer_size:
-            obs = self.obs_buffer[self.read_idx:self.read_idx+batch_size]
-            action = self.action_buffer[self.read_idx:self.read_idx+batch_size]
-            reward = self.reward_buffer[self.read_idx:self.read_idx+batch_size]
-            self.read_idx += batch_size
+        """get a batch of size batch_size from the buffer if possible.
+           return empty arrays otherwise
+        
+        Arguments:
+            batch_size {int} -- determines the size of the resulting batch
+        
+        Raises:
+            IndexError: in case I was too stupid to calculate remainder_size
+        
+        Returns:
+            old_state -- batch of old states with size (batch_size x observation_dim0 x observation_dim1)
+            new_state -- batch of old states with size (batch_size x observation_dim0 x observation_dim1)
+            old_state -- batch of old states with size (batch_size)
+            old_state -- batch of old states with size (batch_size)
+        """
+        # calculate currently possible batch size: at least zero
+        # at most batch size but never more than write_idx - read_idx)
+        remainder_size = min(batch_size, max(0, self.write_idx - self.read_idx))
+        if remainder_size == 0:
+            # setting empty to True is a duplicate
+            self.empty = True
+            old_state = np.array([])
+            new_state = np.array([])
+            action = np.array([])
+            reward = np.array([])
+        elif remainder_size > 0:
+            old_state = self.old_state[self.read_idx:self.read_idx + remainder_size]
+            new_state = self.new_state[self.read_idx:self.read_idx + remainder_size]
+            action = self.action[self.read_idx:self.read_idx + remainder_size]
+            reward = self.reward[self.read_idx:self.read_idx + remainder_size]
+            self.read_idx += remainder_size
+            if remainder_size <= batch_size:
+                self.empty = True
 
-            return obs, reward, action, done
-        else:
-            tail_indices = batch_size - (self.max_buffer_size - self.read_idx)
-            top_indices = batch_size - tail_indices
-            tail_data = self.obs_buffer[self.read_idx:]
-            top_data = self.obs_buffer[:top_indices]
-            action = np.concatenate((self.action_buffer[self.read_idx:],self.action_buffer[:top_indices]))
-            reward = np.concatenate((self.reward_buffer[self.read_idx:],self.reward_buffer[:top_indices]))
-            self.read_idx = top_indices
-
-            return np.stack((tail_data, top_data)), reward, action, done
-
-    def shuffle(self):
-        perm = np.random.permutation(self.current_buffer_size)
-        self.obs_buffer = self.obs_buffer[perm]
-        self.reward_buffer = self.reward_buffer[perm]
-        self.action_buffer = self.action_buffer[perm]
-
-    def resetReadIndex(self):
-        # ToDo: implement
-        pass
-
+        return old_state, new_state, action, reward
+    
+    def shuffle(self, seed=False):
+        """shuffles the current buffer but only the values which have already been written
+        
+        Keyword Arguments:
+            seed {int} -- pass a seed for debugging purpose if need be (default: {False})
+        """
+        if seed: np.random.seed(seed)
+        # size of content to shuffle is max_buffer_size if a wrap around has happened
+        # else its write_idx because we dont want to shuffle empty values
+        content_size = self.write_idx if not self.full else self.max_buffer_size
+        permutation = np.random.permutation(content_size)
+        # this exists only to confuse readers
+        shuf = lambda x: np.random.shuffle(x[:content_size])
+        map(shuf, [self.old_state, self.new_state, self.action, self.reward])
+    
+    def reset_read_idx(self):
+        """resets the read_idx to 0"""
+        self.read_idx = 0
+    
+    def reset_write_idx(self):
+        """resets the write_idx to 0"""
+        self.write_idx = 0
+    
+    def reset_indices(self):
+        """calls both indx_reset functions to fully reset the buffer"""
+        self.reset_read_idx()
+        self.reset_write_idx()
+    
     def __repr__(self):
-        return f"Replay buffer: \n\t \
-            buffer size: \t{self.max_buffer_size}\n\t\
-            current index: \t{self.read_idx}\n\t\ "
+        pass
