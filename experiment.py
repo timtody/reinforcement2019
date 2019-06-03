@@ -1,10 +1,11 @@
 import numpy as np
+from time import time
 
-from library import inout, config, models
+from library import inout, config, agents
 from default_configs import defaultConfig, pacmanNetConfig
 import plotter
 
-from envs import mazewandererenv
+from envs import mazewandererenv, replaybuffer
 
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
@@ -16,104 +17,111 @@ def runExp(*args, **kwargs):
     conf.generateDynamicEntries()
     inout.makeDir(conf.log_dir)
     inout.makeDir(conf.image_dir)
-    print(conf)
     if conf.write_conf:
         conf.writeConfigToDisk(conf.log_dir)
 
-    # Setup Models
-    pacNetConf = pacmanNetConfig()
-    pacModel, pacOptimizer = models.definePacmanTestModel1(pacNetConf)
-    pacModel.compile(optimizer=pacOptimizer, loss='mse')
-    #pacModel.summary()
-
-    # Q-Learning Params
-    y = 0.95
-    eps = 0.5
-    decay_factor = 0.999
-
     # Init Logs # Todo: replace with preallocated arrays 
-    logRewardPerGame = []
-    logAvgRewardPerStep = []
     logStepsPerGame = []
+    logAvgStepTime = []
+    logAvgTrainTime = []
+    sumExperiences = 0
     
     # Init Game Env
     env = mazewandererenv.Env(levelName=conf.level_name)
 
-    # Run
-    for episodeNum in range(conf.num_episodes):
-        # Print Status
-        if episodeNum % 10 == 0:
-            print("Episode {} of {}".format(episodeNum, conf.num_episodes))
+    # Init Agents
+    pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman')
 
+    # Run
+    print("Training...")
+    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
+    for episodeNum in range(conf.num_episodes):
         # Reset Game Env
         env.reset()
 
         # Get initial state
-        obs, _, _, _ = env.render(update_display=conf.display_game)
-        obspac = np.array(obs["pacman"])
-        state = np.reshape(obspac, (1,obspac.shape[0],obspac.shape[1],1))
-        
-        # Decay Epsilon
-        eps *= decay_factor
+        state, _, _, _ = stepEnv(conf, env)
         
         # (Re-)set game vars
         done = False
-        rewardSum = 0
-        numSteps = 0
+        sumGameSteps = 0
+        timeStepGame = 0
+        timeTrain = 0
 
         # One Game
         while not done:
             # Select Action (Epsilon-Greedy)
-            if np.random.random() < eps:
-                action = np.random.randint(0, pacNetConf.num_actions)
-            else:
-                action = np.argmax(pacModel.predict(state))
-            
-            # Set actions in Env
+            action = pacman.getAction(state)
             env.player.action = env.player.ActionSpace(action)
+            
             # Random Ghosts
             env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
             # Step game and collect reward
-            reward = 0
-            #for _ in range(9):
-            #    _, rewardRaw, _,_ = env.render(update_display=conf.display_game)
-            #    reward += rewardRaw['pacman']
-            nextObs, rewardRaw, done, info = env.render(update_display=conf.display_game)
-            reward += rewardRaw["pacman"]
-
-            # Unpack, Reshape & Set new state
-            nextObs = nextObs["pacman"]
-            newState = np.reshape(nextObs, (1,nextObs.shape[0], nextObs.shape[1],1))
+            startTime = time()
+            newState, reward, done, info = stepEnv(conf, env)
+            timeStepGame += time()-startTime
 
             # Train Model
-            target = reward + y * np.max(pacModel.predict(newState))
-            target_vec = pacModel.predict(state)[0]
-            target_vec[action] = target
-            pacModel.fit(state, target_vec.reshape(-1, pacNetConf.num_actions), epochs=1, verbose=0)
+            startTime = time()
+            pacman.trainWithSinglePair(state, newState, action, reward)
+            pacman.storeExperience(state, newState, action, reward)
+            #if (sumExperiences +1) % pacman.trainDelay == 0:
+            #    pacman.train()
+            #    print('Performed a training step in',time()-startTime,'seconds.')
+            
+            timeTrain += time()-startTime
 
             # Prepare for next round
             state = newState
-            numSteps += 1
-            rewardSum += reward
+
+            # Logging
+            sumGameSteps += 1
+            sumExperiences += 1
+
+            # Break if max steps reached
+            if sumGameSteps == conf.max_steps_per_game:
+                done = True
         
         # Log
-        logStepsPerGame.append((numSteps))
-        logRewardPerGame.append(rewardSum)
-        logAvgRewardPerStep.append(rewardSum/numSteps)
+        logStepsPerGame.append((sumGameSteps))
+        logAvgStepTime.append(timeStepGame/sumGameSteps)
+        logAvgTrainTime.append(timeTrain/sumGameSteps)
+
+        # Print some Status info
+        print(statusOut.format(episodeNum+1,
+                               conf.num_episodes,
+                               sumGameSteps,
+                               pacman.rewardSum,
+                               timeStepGame/sumGameSteps,
+                               timeTrain/sumGameSteps))
+        
+        # Prepare agents for next game round
+        pacman.prepForNextGame()
+
+
     
     # Plot Results
     plotter.pacmanAgentPerf(conf, 
                             logStepsPerGame,
-                            logRewardPerGame,
-                            logAvgRewardPerStep)
+                            pacman.rewardLog)
+    plotter.times(conf,
+                  logAvgStepTime, 
+                  logAvgTrainTime)
     
-    # Return Model
-    return pacModel
+    # Return Handles for Debugging
+    return pacman, conf
 
-
+def stepEnv(conf, env):
+    obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
+    #from matplotlib import pyplot as plt
+    #plt.imshow(display)
+    #plt.show()
+    reward = rewardRaw["pacman"]
+    state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
+    return state, reward, done, info
 
 if __name__ == "__main__":
     runExp()

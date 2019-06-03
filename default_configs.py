@@ -9,13 +9,22 @@ def pacmanNetConfig():
     rc = RapidConfig()
 
     # Network input/output shape
-    rc.input_x_dim = 576
-    rc.input_y_dim = 640
+    rc.input_x_dim = 72
+    rc.input_y_dim = 80
     rc.c_channels = 1
     rc.num_actions = 4
 
     rc.optimizer = 'adadelta' # other options: 'sgd', 'adam', 'adagrad'
     rc.learning_rate = 1.0
+
+    # Q-Learning Parameters
+    rc.y = 0.95
+    rc.eps = 0.5
+    rc.decay_factor = 0.999
+
+    rc.replay_buffer_size = 130
+    rc.train_batch_size = 128
+    rc.num_train_after_experiences = 130
 
     return rc
 
@@ -27,9 +36,10 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 1000
+    rc.max_steps_per_game = 1500
     
     # Game Config
-    rc.level_name = 'Full' # Options: Full, Chaos, Race, Empty
+    rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty
     rc.display_game = True
 
     # Random seed

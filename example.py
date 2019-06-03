@@ -8,7 +8,7 @@ buf = replaybuffer.ReplayBuffer(max_buffer_size = 3)
 i = 0
 while 1:
     # render the env, get observations and rewards
-    obs, reward, done, info = env.render()
+    obs, reward, done, info, display = env.render()
     
     # pacman und ghosts have  ActionSpace = IDLE, UP, DOWN, LEFT, RIGHT
     # do some RL stuff - choose actions
@@ -32,5 +32,9 @@ while 1:
 
 buf.shuffle()
 obs, reward, action = buf.next_batch(2)
+print(obs.shape, reward.shape, action)
+obs, reward, action = buf.next_batch(2)
+# Weird extra dimension:
+print(obs.shape, reward.shape, action)
 obs, reward, action = buf.next_batch(2)
 print(obs.shape, reward.shape, action)
