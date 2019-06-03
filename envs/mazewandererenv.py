@@ -9,6 +9,7 @@ from .level import Level
 
 class Env:
     def __init__(self, config=BaseConfig, levelName='Full'):
+        flags = DOUBLEBUF
         pygame.init()
         pygame.font.init()
         # config
@@ -16,7 +17,7 @@ class Env:
         self.SCREEN_SIZE = pygame.Rect(config.SCREEN_SIZE)
         self.action_space = ActionSpace
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
-        self.screen = pygame.display.set_mode(self.SCREEN_SIZE.size)
+        self.screen = pygame.display.set_mode(self.SCREEN_SIZE.size, flags)
         self.timer = pygame.time.Clock()
         self.level = Level(levelName)
         
@@ -77,15 +78,20 @@ class Env:
         self.init_playables()
         self.setup_level(walls=False)
 
-    def render(self, update_display=False):
+    def render(self, update_display=False, render_text=False):
         for e in pygame.event.get():
             if e.type == QUIT:
                 sys.exit()
-        # calculate pacmans points and lives
-        surface_points = self.myfont.render(f'points: {self.player.points}', 
-        False, (0, 0, 0))
-        surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
-        False, (0, 0, 0))
+
+        if render_text:
+            # calculate pacmans points and lives
+            surface_points = self.myfont.render(f'points: {self.player.points}', 
+            False, (0, 0, 0))
+            surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
+            False, (0, 0, 0))
+            # show points and lives
+            self.screen.blit(surface_points,(0,17*self.TILE_SIZE-10))
+            self.screen.blit(surface_lives,(256,17*self.TILE_SIZE-10))
 
         self.entities.update()
         self.screen.fill((0, 0, 0))
@@ -94,9 +100,7 @@ class Env:
         self.entities.draw(self.screen)
         self.platforms.draw(self.screen)
 
-        # show points and lives
-        self.screen.blit(surface_points,(0,17*32-10))
-        self.screen.blit(surface_lives,(256,17*32-10))
+
         
         if update_display: pygame.display.update()
 
