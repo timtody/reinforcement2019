@@ -44,6 +44,7 @@ class Env:
         level_width = len(self.level.string_representation[0])*self.TILE_SIZE
         level_height = len(self.level.string_representation)*self.TILE_SIZE
         # build the level
+        self.numCoins = 0
         x = y = 0
         for row in self.level.string_representation:
             for col in row:
@@ -51,6 +52,7 @@ class Env:
                     Wall((x, y), self.platforms)
                 if col == " " and not (x, y) == self.player.rect.topleft:
                     Coin((x, y), self.coins)
+                    self.numCoins += 1
                 x += self.TILE_SIZE
             y += self.TILE_SIZE
             x = 0

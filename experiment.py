@@ -17,8 +17,6 @@ def runExp(*args, **kwargs):
     conf.generateDynamicEntries()
     inout.makeDir(conf.log_dir)
     inout.makeDir(conf.image_dir)
-    if conf.write_conf:
-        conf.writeConfigToDisk(conf.log_dir)
 
     # Init Logs # Todo: replace with preallocated arrays 
     logStepsPerGame = []
@@ -28,9 +26,16 @@ def runExp(*args, **kwargs):
     
     # Init Game Env
     env = mazewandererenv.Env(conf, levelName=conf.level_name)
+    conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
+    #print('max reward=', conf.pacman_max_reward_per_game)
+    #conf.max_steps_per_game = conf.pacman_max_reward_per_game
 
     # Init Agents
     pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
+
+    # Write conf to disk
+    if conf.write_conf:
+        conf.writeConfigToDisk(conf.log_dir)
 
     # Run
     print("Training...")
