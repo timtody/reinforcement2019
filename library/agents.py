@@ -73,7 +73,7 @@ class Agent():
             # Get next batch
             stateBatch, newStateBatch, actionBatch, rewardBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
             if stateBatch.size == 0:
-                break;
+                break
             # Make batched predicitons
             predStates = self.model.predict(stateBatch)
             predNewStates = self.model.predict(newStateBatch)
