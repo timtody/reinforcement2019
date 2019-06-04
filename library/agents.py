@@ -86,7 +86,10 @@ class Agent():
                 trainTargets[i,int(actionBatch[i])] = targetRewards[i]
 
             # Train model
-            self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+            history = self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+            loss = history.history['loss']
+            self.lossLog.append(loss)
+
         # Reset Buffers
         self.trainBuffer.reset()
 
