@@ -111,6 +111,9 @@ def runExp(*args, **kwargs):
                   logAvgStepTime, 
                   logAvgTrainTime)
     
+    # Save Models
+    pacman.saveAgentState()
+    
     # Return Handles for Debugging
     return pacman, conf
 

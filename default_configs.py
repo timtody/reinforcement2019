@@ -58,7 +58,7 @@ def defaultConfig():
     rc.load_weights = False
     rc.save_weights = True
     rc.enable_checkpoints = True
-    rc.save_model = True
+    rc.save_models = True
     rc.save_history = True
     rc.save_debug_images = True
 
@@ -68,7 +68,7 @@ def defaultConfig():
     rc.weights_checkpoint_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
     rc.model_checkpoint_path = ['dynamic', "self.log_dir + 'best_model.h5'"]
     rc.image_dir = ['dynamic', "self.log_dir + 'images/'"]
-    rc.model_save_name = 'model.h5'
+    rc.model_save_name = '_model.h5'
     
     return rc
 

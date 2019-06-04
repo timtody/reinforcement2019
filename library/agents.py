@@ -78,3 +78,7 @@ class Agent():
             self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
         # Reset Buffers
         self.trainBuffer.reset()
+
+    def saveAgentState(self):
+        if self.conf.save_models:
+            self.model.save((self.conf.log_dir + self.name + self.conf.model_save_name))
