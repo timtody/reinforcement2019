@@ -69,12 +69,11 @@ class Agent():
 
 
     def train(self):
-        done = False
-        while not done:
-            # Workaround for broken buffer / Get next batch
+        while True:
+            # Get next batch
             stateBatch, newStateBatch, actionBatch, rewardBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
-            done = True
-            
+            if stateBatch.size == 0:
+                break;
             # Make batched predicitons
             predStates = self.model.predict(stateBatch)
             predNewStates = self.model.predict(newStateBatch)
@@ -83,7 +82,7 @@ class Agent():
             targetRewards = rewardBatch + self.agentConf.y * np.max(predNewStates, axis=1)
             trainTargets = predStates
             for i in range(0,len(actionBatch)):
-                trainTargets[i,actionBatch[i]] = targetRewards[i]
+                trainTargets[i,int(actionBatch[i])] = targetRewards[i]
 
             # Train model
             self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
