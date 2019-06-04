@@ -37,7 +37,6 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 1000
-    rc.max_steps_per_game = 1500
     
     # Game Config
     rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty
@@ -62,6 +61,13 @@ def defaultConfig():
     rc.save_history = True
     rc.save_debug_images = True
     rc.use_trained_pacman = False
+
+    # Game Parameters
+    rc.pacman_lives = 3
+    rc.pacman_reward_coin = 10
+    rc.pacman_reward_no_coin = -1
+    rc.pacman_max_reward_per_game = 140
+    rc.max_steps_per_game = 140
 
     # Dynamic folder- and filenames
     rc.weights_load_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]

@@ -62,9 +62,9 @@ class Coin(Entity):
 
 
 class PacMan(Entity):
-    def __init__(self, group, platforms, coins, ghosts, pos):
+    def __init__(self, group, platforms, coins, ghosts, pos, lives, coinReward, noCoinReward):
         super().__init__(group)
-        self.lives = 3
+        self.lives = lives
         self.points = 0
         self.image, self.rect = load_image('pacman.png')
         self.start = pos
@@ -79,9 +79,11 @@ class PacMan(Entity):
         self.reward = 0
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
+        self.coinReward = coinReward
+        self.noCoinReward = noCoinReward
         
     def update(self):
-        self.reward = 0
+        self.reward = self.noCoinReward
         # get keyboard inputs
         # subject to change with simulated env
         if self.action == self.ActionSpace.IDLE:
@@ -111,7 +113,7 @@ class PacMan(Entity):
             if pygame.sprite.collide_rect(self, c):
                 c.kill()
                 self.points += 1
-                self.reward = 10
+                self.reward = self.coinReward
         
         # check for collision with ghosts
         for g in self.ghosts:

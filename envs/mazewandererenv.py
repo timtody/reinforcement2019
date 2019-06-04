@@ -9,11 +9,12 @@ from .level import Level
 from PIL import Image
 
 class Env:
-    def __init__(self, config=BaseConfig, levelName='Full'):
+    def __init__(self, expConfig, config=BaseConfig, levelName='Full'):
         flags = DOUBLEBUF
         pygame.init()
         pygame.font.init()
         # config
+        self.expConfig = expConfig
         self.TILE_SIZE = config.TILE_SIZE
         self.SCREEN_SIZE = pygame.Rect(config.SCREEN_SIZE)
         self.action_space = ActionSpace
@@ -21,7 +22,7 @@ class Env:
         self.screen = pygame.display.set_mode(self.SCREEN_SIZE.size, flags)
         self.timer = pygame.time.Clock()
         self.level = Level(levelName)
-        
+
         # sprite groups
         self.playables = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
@@ -67,7 +68,10 @@ class Env:
             (self.TILE_SIZE*0, self.TILE_SIZE*9))
         self.player = PacMan(
             [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
-            (self.TILE_SIZE*3, self.TILE_SIZE*2))
+            (self.TILE_SIZE*3, self.TILE_SIZE*2),
+            self.expConfig.pacman_lives,
+            self.expConfig.pacman_reward_coin,
+            self.expConfig.pacman_reward_no_coin)
     
     def reset(self):
         # delete all current coins and players

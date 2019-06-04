@@ -27,7 +27,7 @@ def runExp(*args, **kwargs):
     sumExperiences = 0
     
     # Init Game Env
-    env = mazewandererenv.Env(levelName=conf.level_name)
+    env = mazewandererenv.Env(conf, levelName=conf.level_name)
 
     # Init Agents
     pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
@@ -66,8 +66,8 @@ def runExp(*args, **kwargs):
 
             # Train Model
             startTime = time()
-            pacman.trainWithSinglePair(state, newState, action, reward)
             pacman.storeExperience(state, newState, action, reward)
+            pacman.trainWithSinglePair(state, newState, action, reward)
             #if (sumExperiences +1) % pacman.trainDelay == 0:
             #    pacman.train()
             #    print('Performed a training step in',time()-startTime,'seconds.')
@@ -110,6 +110,10 @@ def runExp(*args, **kwargs):
     plotter.times(conf,
                   logAvgStepTime, 
                   logAvgTrainTime)
+    
+    plotter.modelLoss(conf,
+                      pacman.lossLog,
+                      pacman.name)
     
     # Save Models
     pacman.saveAgentState()

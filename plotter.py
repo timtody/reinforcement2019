@@ -16,7 +16,7 @@ def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame):
     
     plt.title("Performance: Pacman Agent")
     plt.xlim((1,len(stepsPerGame)))
-    
+
     if conf.save_plots:
         plt.savefig(conf.log_dir + 'pacmanPerf.png')
 
@@ -40,3 +40,17 @@ def times(conf, avgStepTime, avgTrainTime):
 
     if conf.show_plots:
         plt.show()
+
+def modelLoss(conf, loss, modelName):
+    fig = plt.figure()
+    plt.plot(loss)
+    plt.title(modelName)
+    plt.ylabel("loss")
+    plt.xlabel("train step")
+
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + modelName + '_model_loss.png')
+
+    if conf.show_plots:
+        plt.show()
+

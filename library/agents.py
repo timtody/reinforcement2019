@@ -30,6 +30,8 @@ class Agent():
 
     def __initLoggers(self):
         # Todo: replace with preallocated arrays 
+        self.lossLog = []
+        self.actionLog = []
         self.rewardLog = []
         self.rewardSum = 0
     
@@ -55,13 +57,16 @@ class Agent():
         # Reshape states to fit network
         state = np.reshape(state, (1,state.shape[0],state.shape[1],1))
         newState = np.reshape(state, (1,newState.shape[0], newState.shape[1],1))
-
+        reward = self.rewardSum / self.conf.pacman_max_reward_per_game
         target = reward + self.agentConf.y * np.max(self.model.predict(newState))
         targetVec = self.model.predict(state)[0]
 
         targetVec[action] = target
         trainTarget = targetVec.reshape(-1, self.agentConf.num_actions) # shape from (num_action,) to (1,num_action)
-        self.model.fit(state, trainTarget, epochs=1, verbose=0)
+        history = self.model.fit(state, trainTarget, epochs=1, verbose=0)
+        loss = history.history['loss']
+        self.lossLog.append(loss)
+
 
     def train(self):
         done = False
