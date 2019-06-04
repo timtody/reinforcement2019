@@ -26,6 +26,8 @@ def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame):
 def times(conf, avgStepTime, avgTrainTime):
     x = list(range(1,len(avgStepTime)+1))
 
+    fig = plt.figure()
+
     plt.plot(avgStepTime)
     plt.plot(avgTrainTime)
     plt.legend(["Avg. Time per Game Step", "Avg. Time per Fit"])
