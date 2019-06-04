@@ -11,6 +11,7 @@ def pacmanNetConfig():
     # Network input/output shape
     rc.input_x_dim = 72
     rc.input_y_dim = 80
+    rc.input_shape = (72, 80, 1)
     rc.c_channels = 1
     rc.num_actions = 4
 

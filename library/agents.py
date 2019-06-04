@@ -20,8 +20,7 @@ class Agent():
         self.trainDelay = self.agentConf.num_train_after_experiences
     
     def __initBuffers(self):
-        self.trainBuffer = ReplayBuffer(self.agentConf.replay_buffer_size)
-        self.trainBufferB = ReplayBuffer(self.agentConf.replay_buffer_size)
+        self.trainBuffer = ReplayBuffer(self.agentConf.input_shape, self.agentConf.replay_buffer_size)
 
     def __initLoggers(self):
         # Todo: replace with preallocated arrays 
@@ -38,8 +37,7 @@ class Agent():
     
     def storeExperience(self, oldState, newState, action, reward):
         self.rewardSum += reward
-        self.trainBuffer.append(oldState, reward, action)
-        self.trainBufferB.append(newState, reward, action)
+        self.trainBuffer.append(oldState, newState, action, reward)
 
     def prepForNextGame(self):
         self.rewardLog.append(self.rewardSum)
@@ -61,12 +59,11 @@ class Agent():
 
     def train(self):
         done = False
-        self.trainBuffer.resetReadIndex()
         while not done:
             # Workaround for broken buffer / Get next batch
-            stateBatch, rewardBatch, actionBatch, done = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
-            newStateBatch, _, _, _ = self.trainBufferB.next_batch(self.agentConf.train_batch_size)
-
+            stateBatch, newStateBatch, actionBatch, rewardBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
+            done = True
+            
             # Make batched predicitons
             predStates = self.model.predict(stateBatch)
             predNewStates = self.model.predict(newStateBatch)
@@ -80,4 +77,4 @@ class Agent():
             # Train model
             self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
         # Reset Buffers
-        self.__initBuffers() # ToDo: Remove when buffer code is updated
+        self.trainBuffer.reset()
