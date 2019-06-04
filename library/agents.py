@@ -45,7 +45,8 @@ class Agent():
     
     def storeExperience(self, oldState, newState, action, reward):
         self.rewardSum += reward
-        self.trainBuffer.append(oldState, newState, action, reward)
+        normalizedRewardSum = self.rewardSum / self.conf.pacman_max_reward_per_game
+        self.trainBuffer.append(oldState, newState, action, normalizedRewardSum)
 
     def prepForNextGame(self):
         self.rewardLog.append(self.rewardSum)
@@ -85,7 +86,10 @@ class Agent():
                 trainTargets[i,int(actionBatch[i])] = targetRewards[i]
 
             # Train model
-            self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+            history = self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+            loss = history.history['loss']
+            self.lossLog.append(loss)
+
         # Reset Buffers
         self.trainBuffer.reset()
 
