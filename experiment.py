@@ -30,7 +30,7 @@ def runExp(*args, **kwargs):
     env = mazewandererenv.Env(levelName=conf.level_name)
 
     # Init Agents
-    pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman')
+    pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
 
     # Run
     print("Training...")

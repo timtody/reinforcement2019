@@ -3,20 +3,26 @@ from library import models
 import numpy as np
 
 class Agent():
-    def __init__(self,conf, agentConf, name):
+    def __init__(self,conf, agentConf, name, loadWeights=False):
         self.conf = conf
         self.agentConf = agentConf
         self.name = name
-        self.__setupModel()
+        self.__setupModel(loadWeights=loadWeights)
         self.__initBuffers()
         self.__initLoggers()
 
-    def __setupModel(self, printSummary=False):
+    def __setupModel(self, printSummary=False, loadWeights=False):
         self.model, optimizer = models.definePacmanTestModel1(self.agentConf)
         self.model.compile(optimizer=optimizer, loss='mse')
+        self.eps = self.agentConf.eps
+        if loadWeights:
+            print('Loaded Weights for {0}.'.format(self.name))
+            self.model.load_weights(self.conf.log_dir + self.name + self.conf.weights_save_name)
+            self.eps = 0
+
         if printSummary:
             self.model.summary()
-        self.eps = self.agentConf.eps
+
         self.trainDelay = self.agentConf.num_train_after_experiences
     
     def __initBuffers(self):
@@ -82,3 +88,6 @@ class Agent():
     def saveAgentState(self):
         if self.conf.save_models:
             self.model.save((self.conf.log_dir + self.name + self.conf.model_save_name))
+        if self.conf.save_weights:
+            self.model.save_weights((self.conf.log_dir + self.name + self.conf.weights_save_name))
+
