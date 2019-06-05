@@ -159,12 +159,13 @@ class Ghost(Entity):
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
         # first index of sprite group is pacman
-        self.pacman = playables[0]
+        self.pacman = playables
         self.reward = 0
     
     def distance_to_pacman(self):
+        pacman = self.pacman.sprites()[0]
         ghost_pos = np.array(self.rect.topleft)
-        pacman_pos = np.array(self.pacman.topleft)
+        pacman_pos = np.array(pacman.topleft)
         dist = np.linalg.norm(ghost_pos - pacman_pos)
         
         return dist
