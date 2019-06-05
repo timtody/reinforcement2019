@@ -69,7 +69,8 @@ def defaultConfig():
     rc.pacman_reward_coin = 10
     rc.pacman_reward_no_coin = -1
     rc.pacman_reward_ghost = -10
-    rc.max_steps_per_game = 140
+    rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
+    rc.max_steps_per_game = 4000
 
     # Dynamic folder- and filenames
     rc.weights_load_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]

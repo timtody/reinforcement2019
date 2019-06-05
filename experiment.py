@@ -27,7 +27,6 @@ def runExp(*args, **kwargs):
     # Init Game Env
     env = mazewandererenv.Env(conf, levelName=conf.level_name)
     conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
-    # conf.max_steps_per_game = conf.pacman_max_reward_per_game
 
     # Init Agents
     pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
