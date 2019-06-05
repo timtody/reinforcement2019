@@ -63,6 +63,7 @@ def defaultConfig():
     rc.use_trained_pacman = False
 
     # Game Parameters
+    rc.pacman_reward_type = 0 # Options: 0=reward, 1=rewardSum, 2=rewardsum/maxreward
     rc.pacman_lives = 3
     rc.pacman_reward_coin = 10
     rc.pacman_reward_no_coin = -1

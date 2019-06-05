@@ -43,10 +43,17 @@ class Agent():
             action = np.argmax(self.model.predict(singleState))
         return action
     
-    def storeExperience(self, oldState, newState, action, reward):
-        self.rewardSum += reward
-        normalizedRewardSum = self.rewardSum / self.conf.pacman_max_reward_per_game
-        self.trainBuffer.append(oldState, newState, action, normalizedRewardSum)
+    def storeExperience(self, oldState, newState, action, rewardIn, rewardType):
+        self.rewardSum += rewardIn
+        
+        if rewardType == 0: # Regular reward
+            reward = rewardIn
+        elif rewardType == 1: # Current Score as reward
+            reward = self.rewardSum 
+        elif rewardType == 2: # "Normaized" Score
+            reward = self.rewardSum / self.conf.pacman_max_reward_per_game
+
+        self.trainBuffer.append(oldState, newState, action, reward)
 
     def prepForNextGame(self):
         self.rewardLog.append(self.rewardSum)

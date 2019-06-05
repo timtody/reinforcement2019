@@ -70,7 +70,7 @@ def runExp(*args, **kwargs):
 
             # Train Model
             startTime = time()
-            pacman.storeExperience(state, newState, action, reward)
+            pacman.storeExperience(state, newState, action, reward, conf.pacman_reward_type)
             #pacman.trainWithSinglePair(state, newState, action, reward)
             if pacman.trainBuffer.full():
                 pacman.train()
