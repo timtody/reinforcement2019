@@ -9,6 +9,7 @@ from envs import mazewandererenv, replaybuffer
 
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 def runExp(*args, **kwargs):
     # Setup Config
