@@ -159,7 +159,7 @@ class Ghost(Entity):
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
         # first index of sprite group is pacman
-        self.pacman = self.playables[0]
+        self.pacman = playables[0]
         self.reward = 0
     
     def distance_to_pacman(self):
