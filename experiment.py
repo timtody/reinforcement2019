@@ -52,7 +52,7 @@ def runExp(*args, **kwargs):
         timeStepGame = 0
         timeTrain = 0
 
-        # One Game
+        # One Game (Training)
         while not done:
             # Select Action (Epsilon-Greedy)
             action = pacman.getAction(state)
@@ -63,11 +63,16 @@ def runExp(*args, **kwargs):
             env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
+            # Write Video Data
+            if episodeNum % 100 == 0:
+                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
+                env.writeScreen(conf.image_dir + recordFrameName)
+
             # Step game and collect reward
             startTime = time()
             newState, reward, done, info = stepEnv(conf, env)
             timeStepGame += time()-startTime
-
+            
             # Train Model
             startTime = time()
             pacman.storeExperience(state, newState, action, reward, conf.pacman_reward_type)
@@ -121,9 +126,6 @@ def runExp(*args, **kwargs):
 
 def stepEnv(conf, env):
     obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
-    #from matplotlib import pyplot as plt
-    #plt.imshow(display)
-    #plt.show()
     reward = rewardRaw["pacman"]
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info

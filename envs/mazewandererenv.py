@@ -144,3 +144,6 @@ class Env:
         # batch_size x screen_h x screen_w
 
         return self.observation, self.reward, self.done, self.info, screenRaw
+
+    def writeScreen(self, filePath):
+        pygame.image.save(self.screen, filePath)
