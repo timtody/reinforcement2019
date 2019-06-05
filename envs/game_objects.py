@@ -136,12 +136,12 @@ class PacMan(Entity):
 
 
 class Ghost(Entity):
-    def __init__(self, group, platforms, pos):
+    def __init__(self, group, platforms, pos, movespeed):
         super().__init__(group)
         self.image, self.rect = load_image('ghost.png')
         self.start = pos
         self.rect.topleft = pos
-        self.movespeed = 2
+        self.movespeed = movespeed
         self.hsp = 0
         self.vsp = 0
         self.platforms = platforms
