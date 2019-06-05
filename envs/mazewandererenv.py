@@ -73,7 +73,8 @@ class Env:
             (self.TILE_SIZE*3, self.TILE_SIZE*2),
             self.expConfig.pacman_lives,
             self.expConfig.pacman_reward_coin,
-            self.expConfig.pacman_reward_no_coin)
+            self.expConfig.pacman_reward_no_coin,
+            self.expConfig.pacman_reward_ghost)
     
     def reset(self):
         # delete all current coins and players

@@ -65,8 +65,8 @@ def defaultConfig():
     # Game Parameters
     rc.pacman_lives = 3
     rc.pacman_reward_coin = 10
-    rc.pacman_reward_no_coin = 0
-    rc.pacman_max_reward_per_game = 140
+    rc.pacman_reward_no_coin = -1
+    rc.pacman_reward_ghost = -10
     rc.max_steps_per_game = 140
 
     # Dynamic folder- and filenames
