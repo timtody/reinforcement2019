@@ -104,19 +104,13 @@ def runExp(*args, **kwargs):
         # Prepare agents for next game round
         pacman.prepForNextGame()
 
+        # Occasionally plot intemediate Results
+        if (episodeNum + 1) % 100 == 0:
+             plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
 
-    
+
     # Plot Results
-    plotter.pacmanAgentPerf(conf, 
-                            logStepsPerGame,
-                            pacman.rewardLog)
-    plotter.times(conf,
-                  logAvgStepTime, 
-                  logAvgTrainTime)
-    
-    plotter.modelLoss(conf,
-                      pacman.lossLog,
-                      pacman.name)
+    plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
     
     # Save Models
     pacman.saveAgentState()
@@ -132,6 +126,18 @@ def stepEnv(conf, env):
     reward = rewardRaw["pacman"]
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info
+
+def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime):
+    plotter.pacmanAgentPerf(conf, 
+                            logStepsPerGame,
+                            pacman.rewardLog)
+    plotter.times(conf,
+                  logAvgStepTime, 
+                  logAvgTrainTime)
+    
+    plotter.modelLoss(conf,
+                      pacman.lossLog,
+                      pacman.name)
 
 if __name__ == "__main__":
     runExp()
