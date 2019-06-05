@@ -158,6 +158,9 @@ class Ghost(Entity):
         self.platforms = platforms
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
+    
+    def distance_to_pacman(self):
+        pass
 
     def update(self):
         if self.action == self.ActionSpace.IDLE:
