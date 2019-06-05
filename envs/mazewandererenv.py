@@ -61,19 +61,23 @@ class Env:
         # playables
         self.ghost = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*9, self.TILE_SIZE*9))
+            (self.TILE_SIZE*8, self.TILE_SIZE*8),
+            self.expConfig.ghost_speed)
         self.ghost2 = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*9, self.TILE_SIZE*9))
+            (self.TILE_SIZE*9, self.TILE_SIZE*8),
+            self.expConfig.ghost_speed)
         self.ghost3 = Ghost(
             [self.ghosts, self.entities], self.platforms, 
-            (self.TILE_SIZE*0, self.TILE_SIZE*9))
+            (self.TILE_SIZE*10, self.TILE_SIZE*8),
+            self.expConfig.ghost_speed)
         self.player = PacMan(
             [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
             (self.TILE_SIZE*3, self.TILE_SIZE*2),
             self.expConfig.pacman_lives,
             self.expConfig.pacman_reward_coin,
-            self.expConfig.pacman_reward_no_coin)
+            self.expConfig.pacman_reward_no_coin,
+            self.expConfig.pacman_reward_ghost)
     
     def reset(self):
         # delete all current coins and players
@@ -140,3 +144,6 @@ class Env:
         # batch_size x screen_h x screen_w
 
         return self.observation, self.reward, self.done, self.info, screenRaw
+
+    def writeScreen(self, filePath):
+        pygame.image.save(self.screen, filePath)

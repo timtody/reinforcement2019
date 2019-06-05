@@ -62,7 +62,7 @@ class Coin(Entity):
 
 
 class PacMan(Entity):
-    def __init__(self, group, platforms, coins, ghosts, pos, lives, coinReward, noCoinReward):
+    def __init__(self, group, platforms, coins, ghosts, pos, lives, coinReward, noCoinReward, ghostColReward):
         super().__init__(group)
         self.lives = lives
         self.points = 0
@@ -82,6 +82,7 @@ class PacMan(Entity):
         self.action = ActionSpace.IDLE
         self.coinReward = coinReward
         self.noCoinReward = noCoinReward
+        self.ghostColReward = ghostColReward
     
     def rotate(self, angle):
         self.rotation_angle = angle
@@ -130,6 +131,7 @@ class PacMan(Entity):
         for g in self.ghosts:
             if pygame.sprite.collide_rect(self, g):
                 self.lives -= 1
+                self.reward = self.ghostColReward
                 g.reward = 10
                 self.rect.topleft = self.start
                 for g in self.ghosts:
@@ -145,12 +147,12 @@ class PacMan(Entity):
 
 
 class Ghost(Entity):
-    def __init__(self, group, platforms, pos):
+    def __init__(self, group, platforms, pos, movespeed):
         super().__init__(group)
         self.image, self.rect = load_image('ghost.png')
         self.start = pos
         self.rect.topleft = pos
-        self.movespeed = 2
+        self.movespeed = movespeed
         self.hsp = 0
         self.vsp = 0
         self.platforms = platforms

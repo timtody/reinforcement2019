@@ -9,6 +9,7 @@ from envs import mazewandererenv, replaybuffer
 
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 def runExp(*args, **kwargs):
     # Setup Config
@@ -27,7 +28,6 @@ def runExp(*args, **kwargs):
     # Init Game Env
     env = mazewandererenv.Env(conf, levelName=conf.level_name)
     conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
-    # conf.max_steps_per_game = conf.pacman_max_reward_per_game
 
     # Init Agents
     pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
@@ -52,7 +52,7 @@ def runExp(*args, **kwargs):
         timeStepGame = 0
         timeTrain = 0
 
-        # One Game
+        # One Game (Training)
         while not done:
             # Select Action (Epsilon-Greedy)
             action = pacman.getAction(state)
@@ -63,14 +63,19 @@ def runExp(*args, **kwargs):
             env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
+            # Write Video Data
+            if episodeNum % 100 == 0 and conf.save_debug_images:
+                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
+                env.writeScreen(conf.image_dir + recordFrameName)
+
             # Step game and collect reward
             startTime = time()
             newState, reward, done, info = stepEnv(conf, env)
             timeStepGame += time()-startTime
-
+            
             # Train Model
             startTime = time()
-            pacman.storeExperience(state, newState, action, reward)
+            pacman.storeExperience(state, newState, action, reward, conf.pacman_reward_type)
             #pacman.trainWithSinglePair(state, newState, action, reward)
             if pacman.trainBuffer.full():
                 pacman.train()
@@ -105,9 +110,27 @@ def runExp(*args, **kwargs):
         # Prepare agents for next game round
         pacman.prepForNextGame()
 
+        # Occasionally plot intemediate Results
+        if (episodeNum + 1) % 100 == 0:
+             plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
 
-    
+
     # Plot Results
+    plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
+    
+    # Save Models
+    pacman.saveAgentState()
+    
+    # Return Handles for Debugging
+    return pacman, conf
+
+def stepEnv(conf, env):
+    obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
+    reward = rewardRaw["pacman"]
+    state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
+    return state, reward, done, info
+
+def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime):
     plotter.pacmanAgentPerf(conf, 
                             logStepsPerGame,
                             pacman.rewardLog)
@@ -118,21 +141,6 @@ def runExp(*args, **kwargs):
     plotter.modelLoss(conf,
                       pacman.lossLog,
                       pacman.name)
-    
-    # Save Models
-    pacman.saveAgentState()
-    
-    # Return Handles for Debugging
-    return pacman, conf
-
-def stepEnv(conf, env):
-    obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
-    #from matplotlib import pyplot as plt
-    #plt.imshow(display)
-    #plt.show()
-    reward = rewardRaw["pacman"]
-    state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
-    return state, reward, done, info
 
 if __name__ == "__main__":
     runExp()

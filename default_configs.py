@@ -23,9 +23,15 @@ def pacmanNetConfig():
     rc.eps = 0.5
     rc.decay_factor = 0.999
 
+<<<<<<< HEAD
     rc.replay_buffer_size = 1000
     rc.train_batch_size = 1000
     rc.num_train_after_experiences = 1000
+=======
+    rc.replay_buffer_size = 500
+    rc.train_batch_size = 500
+    rc.num_train_after_experiences = 500
+>>>>>>> 3368dd20e5cbfabb6830a26ab80554b594161b0b
 
     return rc
 
@@ -63,11 +69,14 @@ def defaultConfig():
     rc.use_trained_pacman = False
 
     # Game Parameters
+    rc.ghost_speed = 0
+    rc.pacman_reward_type = 0 # Options: 0=reward, 1=rewardSum, 2=rewardsum/maxreward
     rc.pacman_lives = 3
     rc.pacman_reward_coin = 10
-    rc.pacman_reward_no_coin = 0
-    rc.pacman_max_reward_per_game = 140
-    rc.max_steps_per_game = 140
+    rc.pacman_reward_no_coin = -1
+    rc.pacman_reward_ghost = -10
+    rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
+    rc.max_steps_per_game = 4000
 
     # Dynamic folder- and filenames
     rc.weights_load_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
