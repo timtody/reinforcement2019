@@ -64,7 +64,7 @@ def runExp(*args, **kwargs):
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             
             # Write Video Data
-            if episodeNum % 100 == 0:
+            if episodeNum % 100 == 0 and conf.save_debug_images:
                 recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
 
