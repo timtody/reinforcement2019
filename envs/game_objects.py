@@ -72,6 +72,7 @@ class PacMan(Entity):
         self.movespeed = 32
         self.hsp = 0
         self.vsp = 0
+        self.rotation_angle = 0
         self.platforms = platforms
         self.coins = coins
         self.ghosts = ghosts
@@ -81,31 +82,41 @@ class PacMan(Entity):
         self.action = ActionSpace.IDLE
         self.coinReward = coinReward
         self.noCoinReward = noCoinReward
+    
+    def rotate(self, angle):
+        self.rotation_angle = angle
+        self.rect = pygame.transform.rotate(self.rect, angle)
         
     def update(self):
         self.reward = self.noCoinReward
-        # get keyboard inputs
-        # subject to change with simulated env
+        # undo rotation from previous game step
+        #self.rotate(-self.rotation_angle)
+        
+        # set the movement parameters of the agent
         if self.action == self.ActionSpace.IDLE:
             move_h = 0
             move_v = 0
         if self.action == self.ActionSpace.UP:
             move_h = 0
             move_v = -1
+            #self.rotate(90)
         if self.action == self.ActionSpace.DOWN:
             move_h = 0
             move_v = 1
+            #self.rotate(270)
         if self.action == self.ActionSpace.LEFT:
             move_h = -1
             move_v = 0
+            #self.rotate(180)
         if self.action == self.ActionSpace.RIGHT:
             move_h = 1
             move_v = 0
+            #self.rotate(0)
 
         self.hsp = move_h*self.movespeed
         self.vsp = move_v*self.movespeed
 
-        # horizontal collision and movement
+        # horizontal collision and movement 
         self.move()
         
         # check for coins

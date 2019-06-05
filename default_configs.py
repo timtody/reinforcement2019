@@ -23,9 +23,9 @@ def pacmanNetConfig():
     rc.eps = 0.5
     rc.decay_factor = 0.999
 
-    rc.replay_buffer_size = 5
-    rc.train_batch_size = 5
-    rc.num_train_after_experiences = 5
+    rc.replay_buffer_size = 1000
+    rc.train_batch_size = 1000
+    rc.num_train_after_experiences = 1000
 
     return rc
 
@@ -36,7 +36,7 @@ def defaultConfig():
     rc.timestamp = rc.getTimestamp()
 
     # Training parameters
-    rc.num_episodes = 1000
+    rc.num_episodes = 5000
     
     # Game Config
     rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty
