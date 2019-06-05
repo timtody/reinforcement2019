@@ -23,15 +23,9 @@ def pacmanNetConfig():
     rc.eps = 0.5
     rc.decay_factor = 0.999
 
-<<<<<<< HEAD
-    rc.replay_buffer_size = 1000
-    rc.train_batch_size = 1000
-    rc.num_train_after_experiences = 1000
-=======
     rc.replay_buffer_size = 500
     rc.train_batch_size = 500
     rc.num_train_after_experiences = 500
->>>>>>> 3368dd20e5cbfabb6830a26ab80554b594161b0b
 
     return rc
 
