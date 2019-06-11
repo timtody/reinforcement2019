@@ -59,7 +59,8 @@ def defaultConfig():
     rc.enable_checkpoints = True
     rc.save_models = True
     rc.save_history = True
-    rc.save_debug_images = True
+    rc.save_debug_images = False
+    rc.record_games = True
     rc.use_trained_pacman = False
 
     # Game Parameters
@@ -78,6 +79,7 @@ def defaultConfig():
     rc.weights_checkpoint_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
     rc.model_checkpoint_path = ['dynamic', "self.log_dir + 'best_model.h5'"]
     rc.image_dir = ['dynamic', "self.log_dir + 'images/'"]
+    rc.video_dir = ['dynamic', "self.log_dir + 'videolog/'"]
     rc.model_save_name = '_model.h5'
     rc.weights_save_name = '_weights.h5'
     
