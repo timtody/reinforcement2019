@@ -159,7 +159,7 @@ class Ghost(Entity):
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
         # first index of sprite group is pacman
-        self.pacman = playables[0]
+        self.pacman = playables #[0] ToDo: fix this "TypeError: 'Group' object does not support indexing"
         self.reward = 0
     
     def distance_to_pacman(self):
