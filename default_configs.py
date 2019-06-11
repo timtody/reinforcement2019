@@ -46,6 +46,12 @@ def defaultConfig():
     # Random seed
     rc.random_seed = 1
 
+    # Test Config
+    rc.test_levels = ['Race2','FullSingle', 'Chaos']
+    rc.test_every = 100 # episodes
+    rc.test_eps = 0.01
+    rc.max_test_steps = 400
+
     # Logs & Result visualization
     rc.exp_base_dir = '/Users/jm/Experiments/'
     rc.log_dir = ['prio', "getFreeDir(self.exp_base_dir + '/rl_pacman_' + self.timestamp + '_')"]
