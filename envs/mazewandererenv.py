@@ -60,15 +60,15 @@ class Env:
     def init_playables(self):
         # playables
         self.ghost = Ghost(
-            [self.ghosts, self.entities], self.platforms, 
+            [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*8, self.TILE_SIZE*8),
             self.expConfig.ghost_speed)
         self.ghost2 = Ghost(
-            [self.ghosts, self.entities], self.platforms, 
+            [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*9, self.TILE_SIZE*8),
             self.expConfig.ghost_speed)
         self.ghost3 = Ghost(
-            [self.ghosts, self.entities], self.platforms, 
+            [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*10, self.TILE_SIZE*8),
             self.expConfig.ghost_speed)
         self.player = PacMan(

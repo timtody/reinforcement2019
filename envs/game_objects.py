@@ -147,7 +147,7 @@ class PacMan(Entity):
 
 
 class Ghost(Entity):
-    def __init__(self, group, platforms, pos, movespeed):
+    def __init__(self, group, platforms, playables, pos, movespeed):
         super().__init__(group)
         self.image, self.rect = load_image('ghost.png')
         self.start = pos
@@ -158,6 +158,16 @@ class Ghost(Entity):
         self.platforms = platforms
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
+        # first index of sprite group is pacman
+        self.pacman = playables[0]
+        self.reward = 0
+    
+    def distance_to_pacman(self):
+        ghost_pos = np.array(self.rect.topleft)
+        pacman_pos = np.array(self.pacman.topleft)
+        dist = np.linalg.norm(ghost_pos - pacman_pos)
+        
+        return dist
 
     def update(self):
         if self.action == self.ActionSpace.IDLE:
@@ -181,3 +191,5 @@ class Ghost(Entity):
 
         # horizontal collision and movement
         self.move()
+        # uncomment if need be
+        #self.distance_to_pacman = self.distance_to_pacman()
