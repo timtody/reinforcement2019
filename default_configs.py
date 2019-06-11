@@ -39,7 +39,8 @@ def defaultConfig():
     rc.num_episodes = 5000
     
     # Game Config
-    rc.level_name = 'FullSingle' # Options: Full, Chaos, Race, Empty
+    rc.start_level_name = 'FullSingle' # Options: Full, FullSingle, Chaos, Race, Race2, Empty
+    rc.switch_levels = {} # example: {5:'Chaos', 7:'FullSingle'} {<ep_num>:'<level>', <ep_num>:'<nextlevel>', ...}
     rc.display_game = True
 
     # Random seed

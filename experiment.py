@@ -30,7 +30,7 @@ def runExp(*args, **kwargs):
         videoLog = inout.VideoWriter(conf.video_dir, 'ep_000000')
     
     # Init Game Env
-    env = mazewandererenv.Env(conf, levelName=conf.level_name)
+    env = mazewandererenv.Env(conf, levelName=conf.start_level_name)
     conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
 
     # Init Agents
@@ -44,6 +44,10 @@ def runExp(*args, **kwargs):
     print("Training...")
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
     for episodeNum in range(conf.num_episodes):
+        if episodeNum in conf.switch_levels:
+            env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
+            conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
+
         # Reset Game Env
         env.reset()
 
@@ -126,7 +130,7 @@ def runExp(*args, **kwargs):
     # Plot Results
     plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
     videoLog.finalize()
-    
+
     # Save Models
     pacman.saveAgentState()
     
