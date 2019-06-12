@@ -72,6 +72,26 @@ class Level:
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
 
+        self.levelDict['RaceGhost'] = [
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PP                PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP PPPPP PP PPPPP PP",
+            "PP                PP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP", ]
+
         # Randomness
         self.levelDict['Chaos'] = [
             "PPPPPPPPPPPPPPPPPPPP",
