@@ -17,8 +17,9 @@ class Agent():
         self.eps = self.agentConf.eps
         if loadWeights:
             print('Loaded Weights for {0}.'.format(self.name))
+            print('weights at: ', self.conf.log_dir + self.name + self.conf.weights_save_name)
             self.model.load_weights(self.conf.log_dir + self.name + self.conf.weights_save_name)
-            self.eps = 0
+            self.eps = 0.05
 
         if printSummary:
             self.model.summary()

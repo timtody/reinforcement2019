@@ -10,10 +10,10 @@ def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame):
     ax1.set_ylabel('Reward')
     ax1.set_xlabel("Game")
 
-    #ax2 = ax1.twinx()
-    #ax2.plot(x, stepsPerGame, 'orangered')
-    #ax2.set_ylabel('Steps', color='orangered')
-    #ax2.tick_params(colors='orangered')
+    ax2 = ax1.twinx()
+    ax2.plot(x, stepsPerGame, 'orangered')
+    ax2.set_ylabel('Steps', color='orangered')
+    ax2.tick_params(colors='orangered')
     
     plt.title("Performance: Pacman Agent")
     plt.xlim((1,len(stepsPerGame)))

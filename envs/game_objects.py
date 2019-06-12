@@ -22,6 +22,7 @@ def load_image(name, colorkey=None):
 class Entity(pygame.sprite.Sprite):
     def __init__(self, *group):
         super().__init__(*group)
+        self.lastValidMove = [0,0]
         
     
     def meeting_platform(self, rect):
@@ -29,22 +30,42 @@ class Entity(pygame.sprite.Sprite):
             if pygame.sprite.collide_rect(rect, p):
                 return True
     
-    def move(self):
+    def move(self,secondTry=False):
+        hspValid = False
+        vspValid = False
         # horizontal collision and movement
         if self.meeting_platform(self.rect.move([self.hsp, 0])):
             while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
                 self.rect = self.rect.move([np.sign(self.hsp), 0])
             self.hsp = 0
+        else:
+            hspValid = True
 
-        self.rect = self.rect.move([self.hsp, 0])
+        #self.rect = self.rect.move([self.hsp, 0])
 
         # vertical collision and movement
         if self.meeting_platform(self.rect.move([0, self.vsp])):
             while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
                 self.rect = self.rect.move([0, np.sign(self.vsp)])
             self.vsp = 0
+        else:
+            vspValid = True
+        
+        if hspValid and vspValid:
+            if self.vsp and self.hsp:
+                print('Sanity Check failed')
+                exit(0)
+            
+            self.rect = self.rect.move([self.hsp, self.vsp])
+            self.lastValidMove = [self.hsp, self.vsp]
+            return
 
-        self.rect = self.rect.move([0, self.vsp])
+        elif not secondTry:
+            self.hsp, self.vsp = self.lastValidMove
+            self.move(secondTry=True)
+
+        
+        #self.rect = self.rect.move([0, self.vsp])
 
 
 class Wall(Entity):
