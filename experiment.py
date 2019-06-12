@@ -90,7 +90,6 @@ def runExp(*args, **kwargs):
             # Step game and collect reward
             startTime = time()
             newState, reward, done, info, display = stepEnv(conf, env)
-            print(env.ghost.distance_to_pacman())
             timeStepGame += time()-startTime
             
             # Train Model
