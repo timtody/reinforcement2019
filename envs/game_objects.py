@@ -186,7 +186,7 @@ class Ghost(Entity):
     def distance_to_pacman(self):
         pacman = self.pacman.sprites()[0]
         ghost_pos = np.array(self.rect.topleft)
-        pacman_pos = np.array(pacman.topleft)
+        pacman_pos = np.array(pacman.rect.topleft)
         dist = np.linalg.norm(ghost_pos - pacman_pos)
         
         return dist
