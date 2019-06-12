@@ -117,6 +117,7 @@ class Env:
 
         # setup return values for render
         screenRaw = pygame.surfarray.array2d(self.screen).T
+        pixels = pygame.surfarray.array3d((self.screen)).transpose((1,0,2))
         screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
         screen = screen/np.max(screen)
         self.observation["pacman"] = screen
@@ -143,7 +144,7 @@ class Env:
         # implement replay buffer
         # batch_size x screen_h x screen_w
 
-        return self.observation, self.reward, self.done, self.info, screenRaw
+        return self.observation, self.reward, self.done, self.info, pixels
 
     def writeScreen(self, filePath):
         pygame.image.save(self.screen, filePath)

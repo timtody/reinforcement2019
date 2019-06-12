@@ -37,6 +37,7 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 5000
+    rc.run_validation = False
     
     # Game Config
     rc.start_level_name = 'FullSingle' # Options: Full, FullSingle, Chaos, Race, Race2, Empty
@@ -60,7 +61,7 @@ def defaultConfig():
     rc.show_plots = False
     rc.write_conf = True
 
-    # Load & Safe
+    # Load & Save
     rc.load_weights = False
     rc.save_weights = True
     rc.enable_checkpoints = True
