@@ -81,7 +81,7 @@ class Level:
             "PP PPPPP PP PPPPP PP",
             "PP PPPPP PP PPPPP PP",
             "PP PPPPP PP PPPPP PP",
-            "PP PPPPP PP PPPPP PP",
+            "PP PPPPPXPPXPPPPP PP",
             "PP PPPPP PP PPPPP PP",
             "PP PPPPP PP PPPPP PP",
             "PP PPPPP PP PPPPP PP",
