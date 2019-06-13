@@ -26,6 +26,9 @@ def runExp(*args, **kwargs):
     logAvgTrainTime = []
     sumExperiences = 0
 
+    logTestAvgReward = []
+    logTestAvgSteps = []
+
     if conf.record_games:
         videoLog = inout.VideoWriter(conf.video_dir, 'ep_000000')
     
@@ -46,12 +49,15 @@ def runExp(*args, **kwargs):
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
     for episodeNum in range(conf.num_episodes):
 
-        if conf.run_validation:
-            if episodeNum % conf.test_every == 0:
-                testPacman(pacman, conf, episodeNum)
-            if episodeNum in conf.switch_levels:
-                env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
-                conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
+        if conf.run_validation and episodeNum % conf.test_every == 0:
+            testAvgReward, testAvgSteps = testPacman(pacman, conf, episodeNum)
+            logTestAvgReward.append(testAvgReward)
+            logTestAvgSteps.append(testAvgSteps)
+            plotTesting(conf, logTestAvgReward, logTestAvgSteps)
+        
+        if episodeNum in conf.switch_levels:
+            env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
+            conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
 
         # Reset Game Env
         env.reset()
@@ -159,8 +165,14 @@ def testPacman(pacman, conf, episodeNum):
 
     # Init Logs
     videoLog = inout.VideoWriter(conf.video_dir, f'test_ep{episodeNum}')
+    logAvgRewardPerLevel = []
+    logAvgStepsPerLevel = []
 
     for level in conf.test_levels:
+        
+        perLevelSumReward = 0
+        perLevelSumSteps = 0
+        
         for currentIteration in range(0, conf.test_repetitions):
             testEnv = mazewandererenv.Env(conf, levelName=level)
 
@@ -199,15 +211,22 @@ def testPacman(pacman, conf, episodeNum):
 
                 if sumGameSteps > conf.max_test_steps:
                     done = True
+            
+            perLevelSumReward += sumReward
+            perLevelSumSteps += sumGameSteps
 
             print('Test Result ({0}): {1} reward in {2} steps.'.format(level, sumReward, sumGameSteps))
 
+        logAvgRewardPerLevel.append(perLevelSumReward/conf.test_repetitions)
+        logAvgStepsPerLevel.append(perLevelSumSteps/conf.test_repetitions)
     # Handle Logs
     videoLog.finalize()
 
     # Restore Training Params
     pacman.eps = trainEps
     testEnv = None
+
+    return logAvgRewardPerLevel, logAvgStepsPerLevel
 
 def stepEnv(conf, env):
     obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
@@ -229,6 +248,10 @@ def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
     plotter.modelLoss(conf,
                       pacman.lossLog,
                       pacman.name)
+
+def plotTesting(conf, logTestAvgReward, logTestAvgSteps):
+    plotter.pacmanTestReward(conf, logTestAvgReward)
+    plotter.pacmanTestSteps(conf, logTestAvgSteps)
 
 if __name__ == "__main__":
     runExp()

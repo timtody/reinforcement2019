@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import numpy as np
 
 def pacmanAgentReward(conf, rewardPerGame):
     x = list(range(1,len(rewardPerGame)+1))
@@ -75,4 +76,41 @@ def modelLoss(conf, loss, modelName):
         plt.show()
     
     plt.close(fig)
+
+def pacmanTestReward(conf, log):
+    fig = plt.figure()
+    plt.title('Test Reward')
+    plt.ylabel('Reward')
+    plt.xlabel('Game')
+
+    log = np.array(log)
+    numTestLevels = log.shape[1]
+    for i in range(numTestLevels):
+        plt.plot(log[:,i])
+    plt.legend(conf.test_levels)
+
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + 'testing_reward.png')
+
+    if conf.show_plots:
+        plt.show()
+
+
+def pacmanTestSteps(conf, log):
+    fig = plt.figure()
+    plt.title('Test Steps')
+    plt.ylabel('Steps')
+    plt.xlabel('Game')
+
+    log = np.array(log)
+    numTestLevels = log.shape[1]
+    for i in range(numTestLevels):
+        plt.plot(log[:,i])
+    plt.legend(conf.test_levels)
+
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + 'testing_steps.png')
+
+    if conf.show_plots:
+        plt.show()
 
