@@ -6,7 +6,7 @@ from .actionspace import ActionSpace
 
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join('img', name)
+    fullname = os.path.join('resources/img', name)
     try:
         image = pygame.image.load(fullname)
     except Exception as e:
@@ -30,7 +30,7 @@ def load_images_directional(name):
     """
     name = name.split(".")[0]
     directions = [name+"_right.png", name+"_down.png", name+"_left.png", name+"_up.png"]
-    join = lambda x: os.path.join("img", x)
+    join = lambda x: os.path.join("resources/img", x)
     fullnames = map(join, directions)
     images = []
     for name in fullnames:
