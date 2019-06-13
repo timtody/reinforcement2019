@@ -24,6 +24,8 @@ def pacmanAgentPerf(conf, stepsPerGame, rewardPerGame):
     if conf.show_plots:
         plt.show()
     
+    plt.close(fig)
+    
 def times(conf, avgStepTime, avgTrainTime):
     x = list(range(1,len(avgStepTime)+1))
 
@@ -41,6 +43,8 @@ def times(conf, avgStepTime, avgTrainTime):
 
     if conf.show_plots:
         plt.show()
+    
+    plt.close(fig)
 
 def modelLoss(conf, loss, modelName):
     fig = plt.figure()
@@ -54,4 +58,6 @@ def modelLoss(conf, loss, modelName):
 
     if conf.show_plots:
         plt.show()
+    
+    plt.close(fig)
 
