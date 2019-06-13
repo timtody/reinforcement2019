@@ -91,6 +91,26 @@ class Level:
             "PP                PP",
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
+        
+        self.levelDict['AvoidGhost'] = [
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PP       PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP    PPPPPPPP",
+            "PPPPPPPPXPP PPPPPPPP",
+            "PPPPPPPP    PPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP PPPPPPPPPPP",
+            "PPPPPPPP          PP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP", ]
 
         self.levelDict['Wide'] = [
             "PPPPPPPPPPPPPPPPPPPP",
