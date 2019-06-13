@@ -64,7 +64,7 @@ class VideoWriter():
         if tag != None:
             image = Image.fromarray(image)#.convert('RGB')
             drawer = ImageDraw.Draw(image)
-            drawer.text((10,10), tag, fill=(255,255,0))
+            drawer.text((20,15), tag, fill=(255,255,0))
             drawer.text((360,576-40), gameInfo, fill=(255,255,0), font=ImageFont.truetype("./resources/8-BIT_WONDER.ttf", 16))
 
         image = np.array(image, dtype='uint8')
