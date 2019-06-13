@@ -58,6 +58,12 @@ def runExp(*args, **kwargs):
 
         # Get initial state
         state, _, _, info, display = stepEnv(conf, env)
+
+        # Record first frame
+        if episodeNum % conf.record_every == 0 and conf.record_games:
+            frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
+            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+            videoLog.appendFrame(display, gameInfo, frameTag)
         
         # (Re-)set game vars
         done = False
@@ -75,15 +81,6 @@ def runExp(*args, **kwargs):
             env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
-
-            # Write Video Data / Debug Images
-            if episodeNum % 100 == 0 and conf.save_debug_images:
-                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
-                env.writeScreen(conf.image_dir + recordFrameName)
-            if episodeNum % 100 == 0 and conf.record_games:
-                frameTag = "ep {0:06d} frame {1:04d}".format(episodeNum, sumGameSteps)
-                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
-                videoLog.appendFrame(display, gameInfo, frameTag)
 
             # Step game and collect reward
             startTime = time()
@@ -106,6 +103,15 @@ def runExp(*args, **kwargs):
             sumGameSteps += 1
             sumExperiences += 1
 
+            # Write Video Data / Debug Images
+            if episodeNum % conf.record_every == 0 and conf.save_debug_images:
+                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
+                env.writeScreen(conf.image_dir + recordFrameName)
+            if episodeNum % conf.record_every == 0 and conf.record_games:
+                frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+                videoLog.appendFrame(display, gameInfo, frameTag)
+
             # Break if max steps reached
             if sumGameSteps == conf.max_steps_per_game:
                 done = True
@@ -115,9 +121,9 @@ def runExp(*args, **kwargs):
         logAvgStepTime.append(timeStepGame/sumGameSteps)
         logAvgTrainTime.append(timeTrain/sumGameSteps)
         
-        if (episodeNum-1) % 100 == 0 and conf.record_games:
-            print('cutting now', episodeNum, 'ep_{0:06d}'.format(episodeNum+99))
-            videoLog.cutHere('ep_{0:06d}'.format(episodeNum+99))
+        if (episodeNum-1) % conf.record_every == 0 and conf.record_games:
+            print('cutting now', episodeNum, 'ep_{0:06d}'.format(episodeNum+conf.record_every-1))
+            videoLog.cutHere('ep_{0:06d}'.format(episodeNum+conf.record_every-1))
 
         # Print some Status info
         print(statusOut.format(episodeNum+1,
@@ -148,39 +154,56 @@ def runExp(*args, **kwargs):
 def testPacman(pacman, conf, episodeNum):
     # Save Training Params
     trainEps = pacman.eps
-    print('testing ...eps ',trainEps, conf.test_eps)
+    print(f'testing... (current train eps {trainEps:0.3f}, test eps {conf.test_eps}) ')
     pacman.eps = conf.test_eps
 
+    # Init Logs
+    videoLog = inout.VideoWriter(conf.video_dir, f'test_ep{episodeNum}')
+
     for level in conf.test_levels:
-        testEnv = mazewandererenv.Env(conf, levelName=level)
+        for currentIteration in range(0, conf.test_repetitions):
+            testEnv = mazewandererenv.Env(conf, levelName=level)
 
-        # Get initial state
-        state, _, _, _, display = stepEnv(conf, testEnv)
-        
-        # (Re-)set game vars
-        done = False
-        sumGameSteps = 0
-        sumReward = 0
+            # Get initial state
+            state, _, _, info, display = stepEnv(conf, testEnv)
 
-        while not done:
-            # Select Action (Epsilon-Greedy)
-            action = pacman.getAction(state)
-            testEnv.player.action = testEnv.player.ActionSpace(action)
-            
-            # Random Ghosts
-            testEnv.ghost.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
-            testEnv.ghost2.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
-            testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
+            # (Re-)set game vars
+            done = False
+            sumGameSteps = 0
+            sumReward = 0
 
-            newState, reward, done, info, display = stepEnv(conf, testEnv)
+            # Record Frame
+            frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+            videoLog.appendFrame(display, gameInfo, frameTag)
 
-            sumReward += reward
-            sumGameSteps += 1
+            while not done:
+                # Select Action (Epsilon-Greedy)
+                action = pacman.getAction(state)
+                testEnv.player.action = testEnv.player.ActionSpace(action)
 
-            if sumGameSteps > conf.max_test_steps:
-                done = True
+                # Random Ghosts
+                testEnv.ghost.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
+                testEnv.ghost2.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
+                testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
 
-        print('Test Result ({0}): {1} reward in {2} steps.'.format(level, sumReward, sumGameSteps))
+                newState, reward, done, info, display = stepEnv(conf, testEnv)
+
+                sumReward += reward
+                sumGameSteps += 1
+                
+                # Record Frame
+                frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+                videoLog.appendFrame(display, gameInfo, frameTag)
+
+                if sumGameSteps > conf.max_test_steps:
+                    done = True
+
+            print('Test Result ({0}): {1} reward in {2} steps.'.format(level, sumReward, sumGameSteps))
+
+    # Handle Logs
+    videoLog.finalize()
 
     # Restore Training Params
     pacman.eps = trainEps

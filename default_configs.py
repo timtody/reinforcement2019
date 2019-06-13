@@ -50,6 +50,7 @@ def defaultConfig():
     # Test Config
     rc.test_levels = ['Race2','FullSingle', 'Chaos']
     rc.test_every = 100 # episodes
+    rc.test_repetitions = 5
     rc.test_eps = 0.01
     rc.max_test_steps = 400
 
@@ -61,14 +62,17 @@ def defaultConfig():
     rc.show_plots = False
     rc.write_conf = True
 
+    # Visual Output
+    rc.save_debug_images = False
+    rc.record_games = True
+    rc.record_every = 100 # Episodes
+
     # Load & Save
     rc.load_weights = False
     rc.save_weights = True
     rc.enable_checkpoints = True
     rc.save_models = True
     rc.save_history = True
-    rc.save_debug_images = False
-    rc.record_games = True
     rc.use_trained_pacman = False
 
     # Game Parameters
