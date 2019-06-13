@@ -148,9 +148,9 @@ class PacMan(Entity):
         if self.action == ActionSpace.LEFT:
             self.image = self.images[2]
         if self.action == ActionSpace.UP:
-            self.image = self.images[1]
-        if self.action == ActionSpace.DOWN:
             self.image = self.images[3]
+        if self.action == ActionSpace.DOWN:
+            self.image = self.images[1]
         
     def update(self):
         self.reward = self.noCoinReward
