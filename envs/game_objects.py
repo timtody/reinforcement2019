@@ -53,6 +53,21 @@ class Entity(pygame.sprite.Sprite):
                 return True
     
     def move(self,secondTry=False):
+        # horizontal collision and movement
+        if self.meeting_platform(self.rect.move([self.hsp, 0])):
+            while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
+                self.rect = self.rect.move([np.sign(self.hsp), 0])
+            self.hsp = 0
+        self.rect = self.rect.move([self.hsp, 0])
+
+        # vertical collision and movement
+        if self.meeting_platform(self.rect.move([0, self.vsp])):
+            while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
+                self.rect = self.rect.move([0, np.sign(self.vsp)])
+            self.vsp = 0
+        self.rect = self.rect.move([0, self.vsp])
+    
+    def move_with_validity_check(self,secondTry=False):
         hspValid = False
         vspValid = False
         # horizontal collision and movement
@@ -85,7 +100,6 @@ class Entity(pygame.sprite.Sprite):
         elif not secondTry:
             self.hsp, self.vsp = self.lastValidMove
             self.move(secondTry=True)
-
         
         #self.rect = self.rect.move([0, self.vsp])
 
