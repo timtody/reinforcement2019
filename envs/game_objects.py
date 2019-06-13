@@ -17,6 +17,28 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
+
+def load_images_directional(name):
+    """loads images with named directional suffixes
+    
+    Arguments:
+        name {string} -- name
+    
+    Returns:
+        [list] -- [images in order of right, down, left, up]
+        [pygame.rect] -- [the corresponding rectangle for position and movement]
+    """
+    name = name.split(".")[0]
+    directions = [name+"_right.png", name+"_down.png", name+"_left.png", name+"_up.png"]
+    join = lambda x: os.path.join("img", x)
+    fullnames = map(join, directions)
+    images = []
+    for name in fullnames:
+        im = pygame.image.load(name)
+        images.append(im)
+    rect = images[0].get_rect()
+
+    return images, rect
     
 
 class Entity(pygame.sprite.Sprite):
@@ -31,6 +53,21 @@ class Entity(pygame.sprite.Sprite):
                 return True
     
     def move(self,secondTry=False):
+        # horizontal collision and movement
+        if self.meeting_platform(self.rect.move([self.hsp, 0])):
+            while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
+                self.rect = self.rect.move([np.sign(self.hsp), 0])
+            self.hsp = 0
+        self.rect = self.rect.move([self.hsp, 0])
+
+        # vertical collision and movement
+        if self.meeting_platform(self.rect.move([0, self.vsp])):
+            while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
+                self.rect = self.rect.move([0, np.sign(self.vsp)])
+            self.vsp = 0
+        self.rect = self.rect.move([0, self.vsp])
+    
+    def move_with_validity_check(self,secondTry=False):
         hspValid = False
         vspValid = False
         # horizontal collision and movement
@@ -63,7 +100,6 @@ class Entity(pygame.sprite.Sprite):
         elif not secondTry:
             self.hsp, self.vsp = self.lastValidMove
             self.move(secondTry=True)
-
         
         #self.rect = self.rect.move([0, self.vsp])
 
@@ -87,7 +123,8 @@ class PacMan(Entity):
         super().__init__(group)
         self.lives = lives
         self.points = 0
-        self.image, self.rect = load_image('pacman.png')
+        self.images, self.rect = load_images_directional('pacman.png')
+        self.image = self.images[0]
         self.start = pos
         self.rect.topleft = pos
         self.movespeed = 32
@@ -105,9 +142,15 @@ class PacMan(Entity):
         self.noCoinReward = noCoinReward
         self.ghostColReward = ghostColReward
     
-    def rotate(self, angle):
-        self.rotation_angle = angle
-        self.rect = pygame.transform.rotate(self.rect, angle)
+    def rotate(self):
+        if self.action == ActionSpace.RIGHT:
+            self.image = self.images[0]
+        if self.action == ActionSpace.LEFT:
+            self.image = self.images[2]
+        if self.action == ActionSpace.UP:
+            self.image = self.images[1]
+        if self.action == ActionSpace.DOWN:
+            self.image = self.images[3]
         
     def update(self):
         self.reward = self.noCoinReward
@@ -137,9 +180,10 @@ class PacMan(Entity):
 
         self.hsp = move_h*self.movespeed
         self.vsp = move_v*self.movespeed
-
         # horizontal collision and movement 
         self.move()
+        self.rotate()
+        
         
         # check for coins
         for c in self.coins:
@@ -180,12 +224,13 @@ class Ghost(Entity):
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
         # first index of sprite group is pacman
-        self.pacman = playables #[0] ToDo: fix this "TypeError: 'Group' object does not support indexing"
+        self.pacman = playables
         self.reward = 0
     
     def distance_to_pacman(self):
+        pacman = self.pacman.sprites()[0]
         ghost_pos = np.array(self.rect.topleft)
-        pacman_pos = np.array(self.pacman.topleft)
+        pacman_pos = np.array(pacman.rect.topleft)
         dist = np.linalg.norm(ghost_pos - pacman_pos)
         
         return dist

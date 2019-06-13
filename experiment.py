@@ -45,12 +45,14 @@ def runExp(*args, **kwargs):
     print("Training...")
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
     for episodeNum in range(conf.num_episodes):
-        if episodeNum % conf.test_every == 0:
-            testPacman(pacman, conf, episodeNum)
-        
-        if episodeNum in conf.switch_levels:
-            env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
-            conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
+
+        if conf.run_validation:
+            if episodeNum % conf.test_every == 0:
+                testPacman(pacman, conf, episodeNum)
+            statusOut
+            if episodeNum in conf.switch_levels:
+                env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
+                conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
 
         # Reset Game Env
         env.reset()
@@ -169,7 +171,7 @@ def testPacman(pacman, conf, episodeNum):
             testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
 
             newState, reward, done, info, display = stepEnv(conf, testEnv)
-            
+
             sumReward += reward
             sumGameSteps += 1
 
