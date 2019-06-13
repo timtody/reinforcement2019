@@ -150,7 +150,7 @@ class Level:
             "PPP PP   PP P  P   P",
             "PPP  PPPPPP PPP    P",
             "PPPP        PPP    P",
-            "PPPP        PPP    P",
+            "PPPPPPPPPPP PPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
 
         # Full Level
