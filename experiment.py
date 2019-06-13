@@ -49,7 +49,6 @@ def runExp(*args, **kwargs):
         if conf.run_validation:
             if episodeNum % conf.test_every == 0:
                 testPacman(pacman, conf, episodeNum)
-            statusOut
             if episodeNum in conf.switch_levels:
                 env = mazewandererenv.Env(conf, levelName=conf.switch_levels[episodeNum])
                 conf.pacman_max_reward_per_game =  env.numCoins * conf.pacman_reward_coin
@@ -58,7 +57,7 @@ def runExp(*args, **kwargs):
         env.reset()
 
         # Get initial state
-        state, _, _, _, display = stepEnv(conf, env)
+        state, _, _, info, display = stepEnv(conf, env)
         
         # (Re-)set game vars
         done = False
@@ -83,9 +82,8 @@ def runExp(*args, **kwargs):
                 env.writeScreen(conf.image_dir + recordFrameName)
             if episodeNum % 100 == 0 and conf.record_games:
                 frameTag = "ep {0:06d} frame{1:04d}".format(episodeNum, sumGameSteps)
-                videoLog.appendFrame(display, frameTag)
-            if episodeNum-1 % 100 == 0 and conf.record_games:
-                videoLog.cutHere('ep_{0:06d}'.format(episodeNum+99))
+                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+                videoLog.appendFrame(display, gameInfo, frameTag)
 
             # Step game and collect reward
             startTime = time()
@@ -116,6 +114,10 @@ def runExp(*args, **kwargs):
         logStepsPerGame.append((sumGameSteps))
         logAvgStepTime.append(timeStepGame/sumGameSteps)
         logAvgTrainTime.append(timeTrain/sumGameSteps)
+        
+        if (episodeNum-1) % 100 == 0 and conf.record_games:
+            print('cutting now', episodeNum, 'ep_{0:06d}'.format(episodeNum+99))
+            videoLog.cutHere('ep_{0:06d}'.format(episodeNum+99))
 
         # Print some Status info
         print(statusOut.format(episodeNum+1,

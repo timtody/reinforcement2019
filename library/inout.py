@@ -6,7 +6,7 @@ import pickle
 from os import path, makedirs, listdir
 from tensorflow.keras.preprocessing import image
 from imageio import imwrite, get_writer, read
-from PIL import ImageDraw, Image
+from PIL import ImageDraw, Image, ImageFont
 import numpy as np
 
 from library import preprocessing as prep
@@ -60,11 +60,12 @@ class VideoWriter():
         self.fps = fps
         self.destFolder = destFolder
 
-    def appendFrame(self, image, tag=None):
+    def appendFrame(self, image, gameInfo, tag=None):
         if tag != None:
-            image = Image.fromarray(image).convert('RGB')
+            image = Image.fromarray(image)#.convert('RGB')
             drawer = ImageDraw.Draw(image)
             drawer.text((10,10), tag, fill=(255,255,0))
+            drawer.text((360,576-40), gameInfo, fill=(255,255,0), font=ImageFont.truetype("./resources/8-BIT_WONDER.ttf", 16))
 
         image = np.array(image, dtype='uint8')
         self.writer.append_data(image)
