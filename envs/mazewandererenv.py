@@ -40,6 +40,9 @@ class Env:
         self.init_playables()
         self.setup_level()
 
+        # max achievable score
+        self.total_coins = len(self.coins)
+
     def setup_level(self, walls=True):
         level_width = len(self.level.string_representation[0])*self.TILE_SIZE
         level_height = len(self.level.string_representation)*self.TILE_SIZE
@@ -143,6 +146,10 @@ class Env:
 
         # implement replay buffer
         # batch_size x screen_h x screen_w
+        
+        # calculate score
+        score = self.total_coins - len(self.coins)
+        self.info["player"]["score"] = score
 
         return self.observation, self.reward, self.done, self.info, pixels
 
