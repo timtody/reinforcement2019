@@ -216,9 +216,12 @@ def stepEnv(conf, env):
     return state, reward, done, info, display
 
 def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime):
-    plotter.pacmanAgentPerf(conf, 
-                            logStepsPerGame,
+    plotter.pacmanAgentReward(conf, 
                             pacman.rewardLog)
+
+    plotter.pacmanAgentSteps(conf, 
+                            logStepsPerGame)
+
     plotter.times(conf,
                   logAvgStepTime, 
                   logAvgTrainTime)
