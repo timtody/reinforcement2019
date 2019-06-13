@@ -61,7 +61,7 @@ def runExp(*args, **kwargs):
 
         # Record first frame
         if episodeNum % conf.record_every == 0 and conf.record_games:
-            frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
+            frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
             gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
             videoLog.appendFrame(display, gameInfo, frameTag)
         
@@ -108,7 +108,7 @@ def runExp(*args, **kwargs):
                 recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
             if episodeNum % conf.record_every == 0 and conf.record_games:
-                frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+                frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
                 gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
                 videoLog.appendFrame(display, gameInfo, frameTag)
 
@@ -173,7 +173,7 @@ def testPacman(pacman, conf, episodeNum):
             sumReward = 0
 
             # Record Frame
-            frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+            frameTag = "Test at ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
             gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
             videoLog.appendFrame(display, gameInfo, frameTag)
 
@@ -193,7 +193,7 @@ def testPacman(pacman, conf, episodeNum):
                 sumGameSteps += 1
                 
                 # Record Frame
-                frameTag = "ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
+                frameTag = "Test at ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
                 gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
                 videoLog.appendFrame(display, gameInfo, frameTag)
 
