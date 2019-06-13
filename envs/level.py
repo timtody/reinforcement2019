@@ -92,6 +92,26 @@ class Level:
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
 
+        self.levelDict['Wide'] = [
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "P     P PP    P    P",
+            "P PPPPP PP PP P PPPP",
+            "P   PPP PP    P    P",
+            "P PPPPP PP PP PPPP P",
+            "P PPPPP PP PP P    P",
+            "P                  P",
+            "P PPPPPPXPPXPPPPPP P",
+            "P PPPPPP PP PPPPPP P",
+            "P                  P",
+            "P PPPPP PP PP P    P",
+            "P PPPPP PP PP PPPP P",
+            "P   PPP PP    P    P",
+            "P PPPPP PP PP P PPPP",
+            "P     P PP    P    P",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP", ]
+
         # Randomness
         self.levelDict['Chaos'] = [
             "PPPPPPPPPPPPPPPPPPPP",
@@ -123,9 +143,9 @@ class Level:
             "P  P PPPPPPPPPP P  P",
             "P  P            P  P",
             "P  P P PPPPPP P P  P",
-            "P    P P    P P    P",
-            "P    P P    P P    P",
-            "P  P P PP  PP P P  P",
+            "P    P PXXXXP P    P",
+            "P    P PXXXXP P    P",
+            "P  P P PPXXPP P P  P",
             "P  P            P  P",
             "P  P PPPPPPPPPP P  P",
             "P                  P",
