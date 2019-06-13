@@ -206,7 +206,7 @@ def testPacman(pacman, conf, episodeNum):
                 
                 # Record Frame
                 frameTag = "Test at ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
-                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
                 videoLog.appendFrame(display, gameInfo, frameTag)
 
                 if sumGameSteps > conf.max_test_steps:
