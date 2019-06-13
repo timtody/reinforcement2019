@@ -68,7 +68,7 @@ def runExp(*args, **kwargs):
         # Record first frame
         if episodeNum % conf.record_every == 0 and conf.record_games:
             frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
-            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
             videoLog.appendFrame(display, gameInfo, frameTag)
         
         # (Re-)set game vars
@@ -115,7 +115,7 @@ def runExp(*args, **kwargs):
                 env.writeScreen(conf.image_dir + recordFrameName)
             if episodeNum % conf.record_every == 0 and conf.record_games:
                 frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
-                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
                 videoLog.appendFrame(display, gameInfo, frameTag)
 
             # Break if max steps reached
@@ -186,7 +186,7 @@ def testPacman(pacman, conf, episodeNum):
 
             # Record Frame
             frameTag = "Test at ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
-            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
+            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
             videoLog.appendFrame(display, gameInfo, frameTag)
 
             while not done:
