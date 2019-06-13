@@ -81,7 +81,7 @@ def runExp(*args, **kwargs):
                 recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
             if episodeNum % 100 == 0 and conf.record_games:
-                frameTag = "ep {0:06d} frame{1:04d}".format(episodeNum, sumGameSteps)
+                frameTag = "ep {0:06d} frame {1:04d}".format(episodeNum, sumGameSteps)
                 gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], 1234)
                 videoLog.appendFrame(display, gameInfo, frameTag)
 
