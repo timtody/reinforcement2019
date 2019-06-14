@@ -83,13 +83,15 @@ class Agent():
             stateBatch, newStateBatch, actionBatch, rewardBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
             if stateBatch.size == 0:
                 break
-            # Make batched predicitons
-            predStates = self.model.predict(stateBatch)
-            predNewStates = self.model.predict(newStateBatch)
+            # make batched predicitons
+            # here the rewards per state are predicted, not the states. Hence the renaming
+            predRewards = self.model.predict(stateBatch)
+            predNewRewards = self.model.predict(newStateBatch)
 
-            # Calculate Targets
-            targetRewards = rewardBatch + self.agentConf.y * np.max(predNewStates, axis=1)
-            trainTargets = predStates
+            # calculate Targets
+            # note that Q(s, a) = r + alph * max(Q(s', a'))
+            targetRewards = rewardBatch + self.agentConf.y * np.max(predNewRewards, axis=1)
+            trainTargets = predRewards
             for i in range(0,len(actionBatch)):
                 trainTargets[i,int(actionBatch[i])] = targetRewards[i]
 
