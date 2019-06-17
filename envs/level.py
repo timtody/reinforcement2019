@@ -95,7 +95,7 @@ class Level:
         self.levelDict['AvoidGhost'] = [
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP",
-            "PP       PPPPPPPPPPP",
+            "PPP      PPPPPPPPPPP",
             "PPPPPPPP PPPPPPPPPPP",
             "PPPPPPPP PPPPPPPPPPP",
             "PPPPPPPP PPPPPPPPPPP",
@@ -108,7 +108,7 @@ class Level:
             "PPPPPPPP PPPPPPPPPPP",
             "PPPPPPPP PPPPPPPPPPP",
             "PPPPPPPP PPPPPPPPPPP",
-            "PPPPPPPP          PP",
+            "PPPPPPPP         PPP",
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
 
