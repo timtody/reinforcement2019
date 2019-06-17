@@ -85,8 +85,8 @@ def runExp(*args, **kwargs):
             
             # Random Ghosts
             env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
-            env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
-            env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
+            #env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
+            #env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
 
             # Step game and collect reward
             startTime = time()
@@ -196,8 +196,8 @@ def testPacman(pacman, conf, episodeNum):
 
                 # Random Ghosts
                 testEnv.ghost.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
-                testEnv.ghost2.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
-                testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
+                #testEnv.ghost2.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
+                #testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
 
                 newState, reward, done, info, display = stepEnv(conf, testEnv)
 
