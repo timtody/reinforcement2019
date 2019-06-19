@@ -91,6 +91,26 @@ class Level:
             "PP                PP",
             "PPPPPPPPPPPPPPPPPPPP",
             "PPPPPPPPPPPPPPPPPPPP", ]
+
+        self.levelDict['RaceGhostX'] = [
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PP                PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPPXPPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP PPPPPXPP PPPPP PP",
+            "PP                PP",
+            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPPPP", ]
         
         self.levelDict['AvoidGhost'] = [
             "PPPPPPPPPPPPPPPPPPPP",
