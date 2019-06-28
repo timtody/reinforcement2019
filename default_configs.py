@@ -21,11 +21,11 @@ def pacmanNetConfig():
     # Q-Learning Parameters
     rc.y = 0.95
     rc.eps = 0.5
-    rc.decay_factor = 0.999
+    rc.decay_factor = 0.9999
 
-    rc.replay_buffer_size = 500
-    rc.train_batch_size = 500
-    rc.num_train_after_experiences = 500
+    rc.replay_buffer_size = 1500
+    rc.train_batch_size = 1500
+    rc.num_train_after_experiences = 1500
 
     return rc
 
@@ -51,7 +51,7 @@ def defaultConfig():
     rc.test_levels = ['Race2','FullSingle', 'Chaos']
     rc.test_every = 100 # episodes
     rc.test_repetitions = 5
-    rc.test_eps = 0.01
+    rc.test_eps = 0.05
     rc.max_test_steps = 400
 
     # Logs & Result visualization

@@ -60,7 +60,8 @@ class Agent():
         self.rewardLog.append(self.rewardSum)
         self.rewardSum = 0
         # Decay Epsilon
-        self.eps *= self.agentConf.decay_factor
+        if self.eps > self.conf.test_eps:
+            self.eps *= self.agentConf.decay_factor
     
     def trainWithSinglePair(self, state, newState, action, reward):
         # Reshape states to fit network
