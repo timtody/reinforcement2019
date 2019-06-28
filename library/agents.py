@@ -1,18 +1,17 @@
 from envs.replaybuffer import ReplayBuffer
-from library import models
 import numpy as np
 
 class Agent():
-    def __init__(self,conf, agentConf, name, loadWeights=False):
+    def __init__(self, conf, agentConf, model, name, loadWeights=False):
         self.conf = conf
         self.agentConf = agentConf
         self.name = name
-        self.__setupModel(loadWeights=loadWeights)
+        self.__setupModel(model, loadWeights=loadWeights)
         self.__initBuffers()
         self.__initLoggers()
 
-    def __setupModel(self, printSummary=False, loadWeights=False):
-        self.model, optimizer = models.definePacmanTestModel1(self.agentConf)
+    def __setupModel(self, model, printSummary=False, loadWeights=False):
+        self.model, optimizer = model(self.agentConf)
         self.model.compile(optimizer=optimizer, loss='mse')
         self.eps = self.agentConf.eps
         if loadWeights:
@@ -44,7 +43,7 @@ class Agent():
             action = np.argmax(self.model.predict(singleState))
         return action
     
-    def storeExperience(self, oldState, newState, action, rewardIn, rewardType):
+    def storeExperience(self, oldState, newState, action, rewardIn, rewardType=0):
         self.rewardSum += rewardIn
         
         if rewardType == 0: # Regular reward
@@ -56,28 +55,13 @@ class Agent():
 
         self.trainBuffer.append(oldState, newState, action, reward)
 
-    def prepForNextGame(self):
+    def prepForNextGame(self, decayEps=True):
         self.rewardLog.append(self.rewardSum)
         self.rewardSum = 0
         # Decay Epsilon
-        if self.eps > self.conf.test_eps:
+        if self.eps > self.conf.test_eps and decayEps:
             self.eps *= self.agentConf.decay_factor
     
-    def trainWithSinglePair(self, state, newState, action, reward):
-        # Reshape states to fit network
-        state = np.reshape(state, (1,state.shape[0],state.shape[1],1))
-        newState = np.reshape(state, (1,newState.shape[0], newState.shape[1],1))
-        reward = self.rewardSum / self.conf.pacman_max_reward_per_game
-        target = reward + self.agentConf.y * np.max(self.model.predict(newState))
-        targetVec = self.model.predict(state)[0]
-
-        targetVec[action] = target
-        trainTarget = targetVec.reshape(-1, self.agentConf.num_actions) # shape from (num_action,) to (1,num_action)
-        history = self.model.fit(state, trainTarget, epochs=1, verbose=0)
-        loss = history.history['loss']
-        self.lossLog.append(loss)
-
-
     def train(self):
         while True:
             # Get next batch
@@ -109,4 +93,3 @@ class Agent():
             self.model.save((self.conf.log_dir + self.name + self.conf.model_save_name))
         if self.conf.save_weights:
             self.model.save_weights((self.conf.log_dir + self.name + self.conf.weights_save_name))
-

@@ -37,6 +37,7 @@ def defaultConfig():
 
     # Training parameters
     rc.num_episodes = 5000
+    rc.pacman_train_limit = 5000
     rc.run_validation = False
     
     # Game Config

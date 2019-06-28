@@ -1,7 +1,7 @@
 import numpy as np
 from time import time
 
-from library import inout, config, agents
+from library import inout, config, agents, models
 from default_configs import defaultConfig, pacmanNetConfig
 import plotter
 
@@ -38,7 +38,16 @@ def runExp(*args, **kwargs):
     trainLevel = conf.start_level_name
 
     # Init Agents
-    pacman = agents.Agent(conf, pacmanNetConfig(), 'pacman', conf.use_trained_pacman)
+    pacman = agents.Agent(conf,
+                          pacmanNetConfig(),
+                          models.definePacmanTestModel1,
+                          'pacman', 
+                          conf.use_trained_pacman)
+    ghost1 = agents.Agent(conf,
+                          pacmanNetConfig(),
+                          models.definePacmanTestModel1,
+                          'ghost1', 
+                          False)
 
     # Write conf to disk
     if conf.write_conf:
@@ -83,8 +92,11 @@ def runExp(*args, **kwargs):
             action = pacman.getAction(state)
             env.player.action = env.player.ActionSpace(action)
             
+            # Non Random Ghosts
+            actionGhost1 = ghost1.getAction(state)
+            env.ghost.action = env.ghost.ActionSpace(actionGhost1)
+
             # Random Ghosts
-            env.ghost.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             #env.ghost2.action = env.ghost.ActionSpace(np.random.randint(0, 4))
             #env.ghost3.action = env.ghost.ActionSpace(np.random.randint(0, 4))
 
@@ -95,10 +107,20 @@ def runExp(*args, **kwargs):
             
             # Train Model
             startTime = time()
-            pacman.storeExperience(state, newState, action, reward, conf.pacman_reward_type)
+            if episodeNum < conf.pacman_train_limit:
+                pacman.storeExperience(state, newState, action, reward["pacman"], conf.pacman_reward_type)
+
             if pacman.trainBuffer.full():
                 pacman.train()
-                print('Performed a training step in',time()-startTime,'seconds.')
+                print('Performed a Pacman training step in',time()-startTime,'seconds.')
+            
+            if episodeNum >= conf.pacman_train_limit:
+                rewardGhost1 = (1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
+                ghost1.storeExperience(state, newState, actionGhost1, rewardGhost1)
+            
+            if ghost1.trainBuffer.full():
+                ghost1.train()
+                print('Performed a Ghost training step in',time()-startTime,'seconds.')
             
             timeTrain += time()-startTime
 
@@ -140,7 +162,12 @@ def runExp(*args, **kwargs):
                                timeTrain/sumGameSteps))
         
         # Prepare agents for next game round
-        pacman.prepForNextGame()
+        if episodeNum < conf.pacman_train_limit:
+            pacman.prepForNextGame()
+            ghost1.prepForNextGame(decayEps=False)
+        else:
+            pacman.prepForNextGame(decayEps=False)
+            ghost1.prepForNextGame()
 
         # Occasionally plot intemediate Results
         if (episodeNum + 1) % 100 == 0:
@@ -201,7 +228,7 @@ def testPacman(pacman, conf, episodeNum):
 
                 newState, reward, done, info, display = stepEnv(conf, testEnv)
 
-                sumReward += reward
+                sumReward += reward["pacman"]
                 sumGameSteps += 1
                 
                 # Record Frame
@@ -229,8 +256,7 @@ def testPacman(pacman, conf, episodeNum):
     return logAvgRewardPerLevel, logAvgStepsPerLevel
 
 def stepEnv(conf, env):
-    obs, rewardRaw, done, info, display = env.render(update_display=conf.display_game)
-    reward = rewardRaw["pacman"]
+    obs, reward, done, info, display = env.render(update_display=conf.display_game)
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info, display
 
