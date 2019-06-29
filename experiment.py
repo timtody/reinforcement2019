@@ -107,10 +107,9 @@ def runExp(*args, **kwargs):
             
             # Train Model
             startTime = time()
-            if episodeNum < conf.pacman_train_limit:
-                pacman.storeExperience(state, newState, action, reward["pacman"], conf.pacman_reward_type)
+            pacman.storeExperience(state, newState, action, reward["pacman"], conf.pacman_reward_type)
 
-            if pacman.trainBuffer.full():
+            if pacman.trainBuffer.full() and (episodeNum < conf.pacman_train_limit):
                 pacman.train()
                 print('Performed a Pacman training step in',time()-startTime,'seconds.')
             
