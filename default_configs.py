@@ -43,6 +43,7 @@ def defaultConfig():
     # Game Config
     rc.start_level_name = 'FullSingle' # Options: Full, FullSingle, Chaos, Race, Race2, Empty
     rc.switch_levels = {} # example: {5:'Chaos', 7:'FullSingle'} {<ep_num>:'<level>', <ep_num>:'<nextlevel>', ...}
+    rc.pacman_start_poses=[(2,2), (15,2), (2,15),(15,15)]
     rc.display_game = True
 
     # Random seed

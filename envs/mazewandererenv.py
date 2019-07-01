@@ -7,6 +7,7 @@ from .actionspace import ActionSpace
 from .configs import BaseConfig
 from .level import Level
 from PIL import Image
+from random import randint
 
 class Env:
     def __init__(self, expConfig, config=BaseConfig, levelName='Full'):
@@ -74,9 +75,11 @@ class Env:
             [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*10, self.TILE_SIZE*8),
             self.expConfig.ghost_speed)
+        # Random Start Position
+        pacmanPos = self.expConfig.pacman_start_poses[randint(0,3)]
         self.player = PacMan(
             [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
-            (self.TILE_SIZE*3, self.TILE_SIZE*2),
+            (self.TILE_SIZE*pacmanPos[0], self.TILE_SIZE*pacmanPos[1]),
             self.expConfig.pacman_lives,
             self.expConfig.pacman_reward_coin,
             self.expConfig.pacman_reward_no_coin,
