@@ -1,13 +1,11 @@
+import plotter
+import os
 import numpy as np
 from time import time
-
 from library import inout, config, agents, models
 from default_configs import defaultConfig, pacmanNetConfig
-import plotter
-
 from envs import mazewandererenv, replaybuffer
 
-import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
@@ -106,21 +104,31 @@ def runExp(*args, **kwargs):
             newState, reward, done, info, display = stepEnv(conf, env, recordScreen)
             timeStepGame += time()-startTime
             
-            # Train Model
             startTime = time()
-            pacman.storeExperience(state, newState, action, reward["pacman"], conf.pacman_reward_type)
+            if (episodeNum // conf.n_games_per_agent) % 2 == 0:
+                #training pac man for n_games_per_agent episodes       
+                pacman.storeExperience(
+                    state,
+                    newState, 
+                    action, 
+                    reward["pacman"], 
+                    conf.pacman_reward_type)
 
-            if pacman.trainBuffer.full() and (episodeNum < conf.pacman_train_limit):
-                pacman.train()
-                print('Performed a Pacman training step in',time()-startTime,'seconds.')
+                if pacman.trainBuffer.full():
+                    pacman.train()
+                    print('Performed a Pacman training step in',time()-startTime,'seconds.')
+            else:
+                # train ghost for n_games_per_agent episodes    
+                rewardGhost1 = 100 * 2 ** (-reward["ghosts"][0]) #(1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
+                ghost1.storeExperience(
+                    state, 
+                    newState, 
+                    actionGhost1, 
+                    rewardGhost1)
             
-            if episodeNum >= conf.pacman_train_limit:
-                rewardGhost1 = (1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
-                ghost1.storeExperience(state, newState, actionGhost1, rewardGhost1)
-            
-            if ghost1.trainBuffer.full():
-                ghost1.train()
-                print('Performed a Ghost training step in',time()-startTime,'seconds.')
+                if ghost1.trainBuffer.full():
+                    ghost1.train()
+                    print('Performed a Ghost training step in',time()-startTime,'seconds.')
             
             timeTrain += time()-startTime
 

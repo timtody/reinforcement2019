@@ -64,8 +64,8 @@ def explore(levelGrid, currentPos, target, currentSteps = 1):
                 minSteps = currentSteps
                 targetFound = True
                 #print('Yeah', minSteps)
-        except IndexError:
-            print('Well, shit')
+        except IndexError as e:
+            print(f'Well, shit. This is an {e.strerror}')
     
     if not targetFound:
         levelGrid[currentPos] = currentSteps -1
@@ -83,8 +83,8 @@ def explore(levelGrid, currentPos, target, currentSteps = 1):
                                            currentSteps=(currentSteps + 1))
                         if steps < minSteps:
                             minSteps = steps
-                except IndexError:
-                    "Wohoo"
+                except IndexError as e:
+                    print(f'Wohoo, this is an {e.strerror}')
     return minSteps, levelGrid
 
                 

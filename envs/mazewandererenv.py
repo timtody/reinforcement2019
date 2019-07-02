@@ -41,6 +41,9 @@ class Env:
         self.init_playables()
         self.setup_level()
 
+        # set renderin parameters
+        self.screen.set_alpha(None)
+
         # max achievable score
         self.total_coins = len(self.coins)
 
@@ -85,6 +88,7 @@ class Env:
             self.expConfig.pacman_reward_coin,
             self.expConfig.pacman_reward_no_coin,
             self.expConfig.pacman_reward_ghost)
+        self.player.movespeed = self.expConfig.pacman_movespeed
     
     def reset(self):
         # delete all current coins and players
@@ -110,7 +114,8 @@ class Env:
             # show points and lives
             self.screen.blit(surface_points,(0,17*self.TILE_SIZE-10))
             self.screen.blit(surface_lives,(256,17*self.TILE_SIZE-10))
-
+            
+        
         self.entities.update()
         self.screen.fill((0, 0, 0))
         self.entities.draw(self.screen)
@@ -134,13 +139,18 @@ class Env:
         self.observation["ghosts"][0] = screen
         self.observation["ghosts"][1] = screen
         self.observation["ghosts"][2] = screen
+        
         # compute the distance to pacman per ghost
-        self.info["ghosts"][0] = np.sqrt(np.square(self.ghost.rect.topleft[0]-self.player.rect.topleft[0]) +
+        self.ghost.reward = np.sqrt(np.square(self.ghost.rect.topleft[0]-self.player.rect.topleft[0]) +
                                         np.square(self.ghost.rect.topleft[1]-self.player.rect.topleft[1]))
-        self.info["ghosts"][1] = np.sqrt(np.square(self.ghost2.rect.topleft[0]-self.player.rect.topleft[0]) +
+        self.ghost2.reward = np.sqrt(np.square(self.ghost2.rect.topleft[0]-self.player.rect.topleft[0]) +
                                         np.square(self.ghost2.rect.topleft[1]-self.player.rect.topleft[1]))
-        self.info["ghosts"][2] = np.sqrt(np.square(self.ghost3.rect.topleft[0]-self.player.rect.topleft[0]) +
+        self.ghost3.reward = np.sqrt(np.square(self.ghost3.rect.topleft[0]-self.player.rect.topleft[0]) +
                                         np.square(self.ghost3.rect.topleft[1]-self.player.rect.topleft[1]))
+        self.info["ghost"][0] = self.ghost.reward
+        self.info["ghost"][1] = self.ghost.reward
+        self.info["ghost"][2] = self.ghost.reward
+
         # get the rewards per entity
         self.reward["pacman"] = self.player.reward
         self.reward["ghosts"][0] = self.ghost.reward

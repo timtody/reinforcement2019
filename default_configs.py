@@ -38,6 +38,7 @@ def defaultConfig():
     # Training parameters
     rc.num_episodes = 5000
     rc.pacman_train_limit = 5000
+    rc.n_games_per_agent = 100
     rc.run_validation = False
     
     # Game Config
@@ -85,8 +86,9 @@ def defaultConfig():
     rc.pacman_reward_no_coin = -1
     rc.pacman_reward_ghost = -10
     rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
+    rc.pacman_movespeed = 32
     rc.max_steps_per_game = 4000
-
+    
     # Dynamic folder- and filenames
     rc.weights_load_path = ['dynamic', "self.log_dir + 'best_weights.h5'"]
     rc.weights_save_path = ['dynamic', "'{0}model_at_{1}_epochs_weights.h5'.format(self.log_dir, self.num_episodes)"]

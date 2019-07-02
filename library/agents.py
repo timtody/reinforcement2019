@@ -1,5 +1,5 @@
-from envs.replaybuffer import ReplayBuffer
 import numpy as np
+from envs.replaybuffer import ReplayBuffer
 
 class Agent():
     def __init__(self, conf, agentConf, model, name, loadWeights=False):
