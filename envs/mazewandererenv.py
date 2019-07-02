@@ -76,7 +76,8 @@ class Env:
             (self.TILE_SIZE*10, self.TILE_SIZE*8),
             self.expConfig.ghost_speed)
         # Random Start Position
-        pacmanPos = self.expConfig.pacman_start_poses[randint(0,3)]
+        numPoses = len(self.expConfig.pacman_start_poses)
+        pacmanPos = self.expConfig.pacman_start_poses[randint(0,numPoses-1)]
         self.player = PacMan(
             [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
             (self.TILE_SIZE*pacmanPos[0], self.TILE_SIZE*pacmanPos[1]),
