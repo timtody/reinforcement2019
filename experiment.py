@@ -81,9 +81,7 @@ def runExp(*args, **kwargs):
         
         # (Re-)set game vars
         done = False
-        sumGameSteps = 0
-        timeStepGame = 0
-        timeTrain = 0
+        sumGameSteps = timeStepGame = 0
 
         # One Game (Training)
         while not done:

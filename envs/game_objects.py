@@ -191,6 +191,7 @@ class PacMan(Entity):
                 c.kill()
                 self.points += 1
                 self.reward = self.coinReward
+                break
         
         # check for collision with ghosts
         for g in self.ghosts:
