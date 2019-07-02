@@ -75,7 +75,6 @@ def runExp(*args, **kwargs):
         # (Re-)set game vars
         done = False
         sumGameSteps = timeStepGame = timeTrain = 0
-
         # Record first frame
         if recordScreen:
             videoLog.setTags(episodeNum, sumGameSteps, pacman.eps, info)
