@@ -14,6 +14,7 @@ class Env:
         flags = DOUBLEBUF
         pygame.init()
         pygame.font.init()
+        pygame.event.set_allowed([QUIT])
         # config
         self.expConfig = expConfig
         self.TILE_SIZE = config.TILE_SIZE
@@ -99,34 +100,19 @@ class Env:
 
         self.init_playables()
         self.setup_level(walls=False)
-
-    def render(self, update_display=False, render_text=False, recording=False):
-        for e in pygame.event.get():
-            if e.type == QUIT:
-                sys.exit()
-
-        if render_text:
-            # calculate pacmans points and lives
-            surface_points = self.myfont.render(f'points: {self.player.points}', 
-            False, (0, 0, 0))
-            surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
-            False, (0, 0, 0))
-            # show points and lives
-            self.screen.blit(surface_points,(0,17*self.TILE_SIZE-10))
-            self.screen.blit(surface_lives,(256,17*self.TILE_SIZE-10))
-            
-        
-        self.entities.update()
-        self.screen.fill((0, 0, 0))
-        self.entities.draw(self.screen)
-        self.coins.draw(self.screen)
-        self.entities.draw(self.screen)
-        self.platforms.draw(self.screen)
-
-
-        
-        if update_display: pygame.display.update()
-
+    
+    def set_rewards(self):
+        # compute the distance to pacman per ghost
+        self.ghost.reward = self.ghost.distance_to_pacman()
+        self.ghost2.reward = self.ghost2.distance_to_pacman()
+        self.ghost3.reward = self.ghost3.distance_to_pacman()
+         # get the rewards per entity
+        self.reward["pacman"] = self.player.reward
+        self.reward["ghosts"][0] = self.ghost.reward
+        self.reward["ghosts"][1] = self.ghost2.reward
+        self.reward["ghosts"][2] = self.ghost3.reward
+    
+    def get_screen(self, recording):
         # setup return values for render
         screenRaw = pygame.surfarray.array2d(self.screen).T
         if recording:
@@ -135,38 +121,52 @@ class Env:
             pixels = None
         screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
         screen = screen/np.max(screen)
+        return screen, pixels
+    
+    def render_text(self):
+        # calculate pacmans points and lives
+        surface_points = self.myfont.render(f'points: {self.player.points}', 
+        False, (0, 0, 0))
+        surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
+        False, (0, 0, 0))
+        # show points and lives
+        self.screen.blit(surface_points,(0,17*self.TILE_SIZE-10))
+        self.screen.blit(surface_lives,(256,17*self.TILE_SIZE-10))
+    
+    def draw_entities(self):
+        self.entities.update()
+        self.screen.fill((0, 0, 0))
+        self.entities.draw(self.screen)
+        self.coins.draw(self.screen)
+        self.platforms.draw(self.screen)
+    
+    def configure_outputs(self, screen):
         self.observation["pacman"] = screen
         self.observation["ghosts"][0] = screen
         self.observation["ghosts"][1] = screen
         self.observation["ghosts"][2] = screen
-        
-        # compute the distance to pacman per ghost
-        self.ghost.reward = np.sqrt(np.square(self.ghost.rect.topleft[0]-self.player.rect.topleft[0]) +
-                                        np.square(self.ghost.rect.topleft[1]-self.player.rect.topleft[1]))
-        self.ghost2.reward = np.sqrt(np.square(self.ghost2.rect.topleft[0]-self.player.rect.topleft[0]) +
-                                        np.square(self.ghost2.rect.topleft[1]-self.player.rect.topleft[1]))
-        self.ghost3.reward = np.sqrt(np.square(self.ghost3.rect.topleft[0]-self.player.rect.topleft[0]) +
-                                        np.square(self.ghost3.rect.topleft[1]-self.player.rect.topleft[1]))
         self.info["ghost"][0] = self.ghost.reward
         self.info["ghost"][1] = self.ghost.reward
         self.info["ghost"][2] = self.ghost.reward
-
-        # get the rewards per entity
-        self.reward["pacman"] = self.player.reward
-        self.reward["ghosts"][0] = self.ghost.reward
-        self.reward["ghosts"][1] = self.ghost2.reward
-        self.reward["ghosts"][2] = self.ghost3.reward
-        # todo: implement done=True for the case that the player has collected all coin
+        
         self.done = self.player.lost or len(self.coins) == 0
         # add all information here which cannot be retrieved easily via the visual channel
         self.info["player"]["lives"] = self.player.lives
-
-        # implement replay buffer
-        # batch_size x screen_h x screen_w
         
         # calculate score
         score = self.total_coins - len(self.coins)
         self.info["player"]["score"] = score
+
+    def render(self, update_display=False, render_text=False, recording=False):
+        for e in pygame.event.get():
+            if e.type == QUIT:
+                sys.exit()
+        if render_text: self.render_text()
+        if update_display: pygame.display.update()
+        self.set_rewards()
+        screen, pixels = self.get_screen(recording)
+        self.configure_outputs(screen)
+        self.draw_entities()
 
         return self.observation, self.reward, self.done, self.info, pixels
 
