@@ -59,16 +59,19 @@ class VideoWriter():
         self.writer = get_writer(destFolder + name + '.mp4', fps=fps)
         self.fps = fps
         self.destFolder = destFolder
+        self.frameTag = None
+        self.gameInfo = None
 
-    def appendFrame(self, image, gameInfo, tag=None):
-        if tag != None:
+    def appendFrame(self, image):
+        if self.frameTag != None:
             image = Image.fromarray(image)#.convert('RGB')
             drawer = ImageDraw.Draw(image)
-            drawer.text((20,15), tag, fill=(255,255,0))
-            drawer.text((360,576-40), gameInfo, fill=(255,255,0), font=ImageFont.truetype("./resources/8-BIT_WONDER.ttf", 16))
+            drawer.text((20,15), self.frameTag, fill=(255,255,0))
+            drawer.text((360,576-40), self.gameInfo, fill=(255,255,0), font=ImageFont.truetype("./resources/8-BIT_WONDER.ttf", 16))
 
         image = np.array(image, dtype='uint8')
         self.writer.append_data(image)
+        self.frameTag = None
 
     def cutHere(self, nextName):
         self.finalize()
@@ -76,6 +79,13 @@ class VideoWriter():
 
     def finalize(self):
         self.writer.close()
+
+    def setTags(self, episodeNum, sumGameSteps, eps, info):
+        lives = info['player']['lives']
+        score = info["player"]["score"]
+        self.frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, eps)
+        self.gameInfo = "lives {0} score {1:05d}".format(lives, score)
+        
 
     def __del__(self):
         self.writer.close()

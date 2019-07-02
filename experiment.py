@@ -68,21 +68,19 @@ def runExp(*args, **kwargs):
 
         # Reset Game Env
         env.reset()
-
         # Get initial state
         recordScreen = episodeNum % conf.record_every == 0 and conf.record_games
         state, _, _, info, display = stepEnv(conf, env, recordScreen)
 
-        # Record first frame
-        if recordScreen:
-            frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
-            gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
-            videoLog.appendFrame(display, gameInfo, frameTag)
-        
         # (Re-)set game vars
         done = False
-        sumGameSteps = timeStepGame = 0
+        sumGameSteps = timeStepGame = timeTrain = 0
 
+        # Record first frame
+        if recordScreen:
+            videoLog.setTags(episodeNum, sumGameSteps, pacman.eps, info)
+            videoLog.appendFrame(display)
+        
         # One Game (Training)
         while not done:
             # Select Action (Epsilon-Greedy)
@@ -141,9 +139,8 @@ def runExp(*args, **kwargs):
                 recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
             if recordScreen:
-                frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
-                gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
-                videoLog.appendFrame(display, gameInfo, frameTag)
+                videoLog.setTags(episodeNum, sumGameSteps, pacman.eps, info)
+                videoLog.appendFrame(display)
 
             # Break if max steps reached
             if sumGameSteps == conf.max_steps_per_game:
