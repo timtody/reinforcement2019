@@ -72,10 +72,11 @@ def runExp(*args, **kwargs):
         env.reset()
 
         # Get initial state
-        state, _, _, info, display = stepEnv(conf, env)
+        recordScreen = episodeNum % conf.record_every == 0 and conf.record_games
+        state, _, _, info, display = stepEnv(conf, env, recordScreen)
 
         # Record first frame
-        if episodeNum % conf.record_every == 0 and conf.record_games:
+        if recordScreen:
             frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, pacman.eps)
             gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
             videoLog.appendFrame(display, gameInfo, frameTag)
@@ -102,7 +103,7 @@ def runExp(*args, **kwargs):
 
             # Step game and collect reward
             startTime = time()
-            newState, reward, done, info, display = stepEnv(conf, env)
+            newState, reward, done, info, display = stepEnv(conf, env, recordScreen)
             timeStepGame += time()-startTime
             
             # Train Model
@@ -134,7 +135,7 @@ def runExp(*args, **kwargs):
             if episodeNum % conf.record_every == 0 and conf.save_debug_images:
                 recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
-            if episodeNum % conf.record_every == 0 and conf.record_games:
+            if recordScreen:
                 frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, sumGameSteps, pacman.eps)
                 gameInfo = "lives {0} score {1:05d}".format(info['player']['lives'], info["player"]["score"])
                 videoLog.appendFrame(display, gameInfo, frameTag)
@@ -203,7 +204,7 @@ def testPacman(pacman, conf, episodeNum):
             testEnv = mazewandererenv.Env(conf, levelName=level)
 
             # Get initial state
-            state, _, _, info, display = stepEnv(conf, testEnv)
+            state, _, _, info, display = stepEnv(conf, testEnv, recordScreen=True)
 
             # (Re-)set game vars
             done = False
@@ -225,7 +226,7 @@ def testPacman(pacman, conf, episodeNum):
                 #testEnv.ghost2.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
                 #testEnv.ghost3.action = testEnv.ghost.ActionSpace(np.random.randint(0, 4))
 
-                newState, reward, done, info, display = stepEnv(conf, testEnv)
+                newState, reward, done, info, display = stepEnv(conf, testEnv, recordScreen=True)
 
                 sumReward += reward["pacman"]
                 sumGameSteps += 1
@@ -254,8 +255,8 @@ def testPacman(pacman, conf, episodeNum):
 
     return logAvgRewardPerLevel, logAvgStepsPerLevel
 
-def stepEnv(conf, env):
-    obs, reward, done, info, display = env.render(update_display=conf.display_game)
+def stepEnv(conf, env, recordScreen):
+    obs, reward, done, info, display = env.render(update_display=conf.display_game, recording=recordScreen)
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info, display
 

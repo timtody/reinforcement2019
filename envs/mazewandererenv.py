@@ -96,7 +96,7 @@ class Env:
         self.init_playables()
         self.setup_level(walls=False)
 
-    def render(self, update_display=False, render_text=False):
+    def render(self, update_display=False, render_text=False, recording=False):
         for e in pygame.event.get():
             if e.type == QUIT:
                 sys.exit()
@@ -124,7 +124,10 @@ class Env:
 
         # setup return values for render
         screenRaw = pygame.surfarray.array2d(self.screen).T
-        pixels = pygame.surfarray.array3d((self.screen)).transpose((1,0,2))
+        if recording:
+            pixels = pygame.surfarray.array3d((self.screen)).transpose((1,0,2))
+        else:
+            pixels = None
         screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
         screen = screen/np.max(screen)
         self.observation["pacman"] = screen
