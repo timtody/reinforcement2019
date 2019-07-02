@@ -21,7 +21,7 @@ class Env:
         self.SCREEN_SIZE = pygame.Rect(config.SCREEN_SIZE)
         self.action_space = ActionSpace
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
-        self.screen = pygame.display.set_mode(self.SCREEN_SIZE.size, flags)
+        self.screen = pygame.display.set_mode((self.SCREEN_SIZE.size), flags)
         self.timer = pygame.time.Clock()
         self.level = Level(levelName)
 
@@ -136,8 +136,8 @@ class Env:
     def draw_entities(self):
         self.entities.update()
         self.screen.fill((0, 0, 0))
-        self.entities.draw(self.screen)
         self.coins.draw(self.screen)
+        self.entities.draw(self.screen)
         self.platforms.draw(self.screen)
     
     def configure_outputs(self, screen):

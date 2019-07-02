@@ -103,7 +103,6 @@ def runExp(*args, **kwargs):
             startTime = time()
             newState, reward, done, info, display = stepEnv(conf, env, recordScreen)
             timeStepGame += time()-startTime
-            
             startTime = time()
             if (episodeNum // conf.n_games_per_agent) % 2 == 0:
                 #training pac man for n_games_per_agent episodes       
@@ -119,7 +118,7 @@ def runExp(*args, **kwargs):
                     print('Performed a Pacman training step in',time()-startTime,'seconds.')
             else:
                 # train ghost for n_games_per_agent episodes    
-                rewardGhost1 = 100 * 2 ** (-reward["ghosts"][0]) #(1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
+                rewardGhost1 = -(reward["ghosts"][0]/10)**2 #(1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
                 ghost1.storeExperience(
                     state, 
                     newState, 

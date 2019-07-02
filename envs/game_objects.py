@@ -16,7 +16,7 @@ def load_image(name, colorkey=None):
         if colorkey is -1:
             colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, RLEACCEL)
-    return image, image.get_rect()
+    return image.convert(), image.get_rect()
 
 def load_images_directional(name):
     """loads images with named directional suffixes
@@ -35,7 +35,7 @@ def load_images_directional(name):
     images = []
     for name in fullnames:
         im = pygame.image.load(name)
-        images.append(im)
+        images.append(im.convert())
     rect = images[0].get_rect()
 
     return images, rect
@@ -197,14 +197,11 @@ class PacMan(Entity):
             if pygame.sprite.collide_rect(self, g):
                 self.lives -= 1
                 self.reward = self.ghostColReward
-                g.reward = 10
+                g.reward += 10
                 self.rect.topleft = self.start
                 for g in self.ghosts:
                     g.rect.topleft = g.start
                 break
-            else:
-                g.reward = 0
-                # todo: reset ghosts and player positions
         
         # check for lives
         if self.lives == 0:
