@@ -123,7 +123,7 @@ def runExp(*args, **kwargs):
                     state, 
                     newState, 
                     actionGhost1, 
-                    reward["ghost"][0])
+                    reward["ghosts"][0])
                 # dirty: log experience for pacman here
                 # todo: find a better way of designing
                 # the adversarial architecture
