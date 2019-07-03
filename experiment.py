@@ -119,7 +119,7 @@ def runExp(*args, **kwargs):
                 ghost1.storeExperience(
                     state, 
                     newState, 
-                    actionGhost1, 
+                    reward["ghost"][0], 
                     rewardGhost1)
             
                 if ghost1.trainBuffer.full():
