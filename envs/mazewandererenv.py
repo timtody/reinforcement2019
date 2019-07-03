@@ -103,14 +103,10 @@ class Env:
     
     def set_rewards(self):
         # compute the distance to pacman per ghost
-        self.ghost.reward = self.ghost.distance_to_pacman()
-        self.ghost2.reward = self.ghost2.distance_to_pacman()
-        self.ghost3.reward = self.ghost3.distance_to_pacman()
-         # get the rewards per entity
-        self.reward["pacman"] = self.player.reward
-        self.reward["ghosts"][0] = self.ghost.reward
-        self.reward["ghosts"][1] = self.ghost2.reward
-        self.reward["ghosts"][2] = self.ghost3.reward
+        # todo: implement abstract reward calculation for all entities
+        self.ghost.calculate_reward()
+        self.ghost2.calculate_reward()
+        self.ghost3.calculate_reward()
     
     def get_screen(self, recording):
         # setup return values for render
@@ -141,6 +137,7 @@ class Env:
         self.platforms.draw(self.screen)
     
     def configure_outputs(self, screen):
+        # here the output dict is filled with relevant values
         self.observation["pacman"] = screen
         self.observation["ghosts"][0] = screen
         self.observation["ghosts"][1] = screen
@@ -148,11 +145,13 @@ class Env:
         self.info["ghost"][0] = self.ghost.reward
         self.info["ghost"][1] = self.ghost.reward
         self.info["ghost"][2] = self.ghost.reward
-        
+        self.reward["pacman"] = self.player.reward
+        self.reward["ghosts"][0] = self.ghost.reward
+        self.reward["ghosts"][1] = self.ghost2.reward
+        self.reward["ghosts"][2] = self.ghost3.reward
         self.done = self.player.lost or len(self.coins) == 0
         # add all information here which cannot be retrieved easily via the visual channel
         self.info["player"]["lives"] = self.player.lives
-        
         # calculate score
         score = self.total_coins - len(self.coins)
         self.info["player"]["score"] = score

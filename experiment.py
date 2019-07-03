@@ -6,7 +6,8 @@ from library import inout, config, agents, models
 from default_configs import defaultConfig, pacmanNetConfig
 from envs import mazewandererenv, replaybuffer
 
-os.environ['KMP_DUPLICATE_LIB_OK']='True' # work around for my broken install
+# work around for my broken install
+os.environ['KMP_DUPLICATE_LIB_OK']='True' 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 def runExp(*args, **kwargs):
@@ -53,7 +54,8 @@ def runExp(*args, **kwargs):
 
     # Run
     print("Training...")
-    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f} timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
+    statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f}\
+                timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
     for episodeNum in range(conf.num_episodes):
 
         if conf.run_validation and episodeNum % conf.test_every == 0:
@@ -188,7 +190,7 @@ def runExp(*args, **kwargs):
 def testPacman(pacman, conf, episodeNum):
     # Save Training Params
     trainEps = pacman.eps
-    print(f'testing... (current train eps {trainEps:0.3f}, test eps {conf.test_eps}) ')
+    print(f'testing... (current train eps {trainEps:0.3f}, test eps {conf.test_eps})')
     pacman.eps = conf.test_eps
 
     # Init Logs

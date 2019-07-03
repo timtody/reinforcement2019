@@ -52,12 +52,21 @@ class Entity(pygame.sprite.Sprite):
             if pygame.sprite.collide_rect(rect, p):
                 return True
     
-    def move(self,secondTry=False):
+    def move(self):
+        """moves and checks for collisions with wall tiles. Does not handle
+        any collision with coins or other entities,
+        
+        
+        Returns:
+            bool -- true if entity is colliding with a wall this frame only
+        """
+        collision = False
         # horizontal collision and movement
         if self.meeting_platform(self.rect.move([self.hsp, 0])):
             while not self.meeting_platform(self.rect.move([np.sign(self.hsp), 0])):
                 self.rect = self.rect.move([np.sign(self.hsp), 0])
             self.hsp = 0
+            collision = True
         self.rect = self.rect.move([self.hsp, 0])
 
         # vertical collision and movement
@@ -65,7 +74,10 @@ class Entity(pygame.sprite.Sprite):
             while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
                 self.rect = self.rect.move([0, np.sign(self.vsp)])
             self.vsp = 0
+            collision = True
         self.rect = self.rect.move([0, self.vsp])
+
+        return collision
     
     def move_with_validity_check(self,secondTry=False):
         hspValid = False
@@ -198,7 +210,7 @@ class PacMan(Entity):
             if pygame.sprite.collide_rect(self, g):
                 self.lives -= 1
                 self.reward = self.ghostColReward
-                g.reward += 10
+                g.caught_pacman = True
                 self.rect.topleft = self.start
                 for g in self.ghosts:
                     g.rect.topleft = g.start
@@ -221,9 +233,10 @@ class Ghost(Entity):
         self.platforms = platforms
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
-        # first index of sprite group is pacman
         self.pacman = playables
         self.reward = 0
+        self.is_collided = False
+        self.caught_pacman = False
     
     def distance_to_pacman(self):
         pacman = self.pacman.sprites()[0]
@@ -232,6 +245,12 @@ class Ghost(Entity):
         dist = np.linalg.norm(ghost_pos - pacman_pos)
         
         return dist
+    
+    def calculate_reward(self):
+        normalized_distance = self.distance_to_pacman() / 1000
+        self.reward = -normalized_distance
+        if self.is_collided: self.reward -= 1
+        if self.caught_pacman: self.reward += 10
 
     def update(self):
         if self.action == self.ActionSpace.IDLE:
@@ -254,6 +273,6 @@ class Ghost(Entity):
         self.vsp = move_v*self.movespeed
 
         # horizontal collision and movement
-        self.move()
-        # uncomment if need be
-        #self.distance_to_pacman = self.distance_to_pacman()
+        # check if a collision has happened
+        self.is_collided = self.move()
+        self.calculate_reward()

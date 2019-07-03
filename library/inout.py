@@ -85,7 +85,6 @@ class VideoWriter():
         score = info["player"]["score"]
         self.frameTag = "Training ep {0:06d} frame {1:04d} (eps={2:0.3f})".format(episodeNum, 0, eps)
         self.gameInfo = "lives {0} score {1:05d}".format(lives, score)
-        
 
     def __del__(self):
         self.writer.close()
