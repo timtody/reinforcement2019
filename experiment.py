@@ -109,22 +109,29 @@ def runExp(*args, **kwargs):
                     action, 
                     reward["pacman"], 
                     conf.pacman_reward_type)
-
+                # dirty: log experience for ghost here
+                # todo: find a better way of designing 
+                # the adversarial architecture
+                ghost1.rewardSum += reward["ghosts"][0]
                 if pacman.trainBuffer.full():
                     pacman.train()
-                    print('Performed a Pacman training step in',time()-startTime,'seconds.')
+                    print('Performed a Pacman training\
+                         step in',time()-startTime,'seconds.')
             else:
                 # train ghost for n_games_per_agent episodes    
-                rewardGhost1 = -(reward["ghosts"][0]/10)**2 #(1000-info["ghosts"][0])/1000-0.2+reward["ghosts"][0]*0.02
                 ghost1.storeExperience(
                     state, 
                     newState, 
                     actionGhost1, 
                     reward["ghost"][0])
-            
+                # dirty: log experience for pacman here
+                # todo: find a better way of designing
+                # the adversarial architecture
+                pacman.rewardSum += reward["pacman"]
                 if ghost1.trainBuffer.full():
                     ghost1.train()
-                    print('Performed a Ghost training step in',time()-startTime,'seconds.')
+                    print('Performed a Ghost training\
+                         step in',time()-startTime,'seconds.')
             
             timeTrain += time()-startTime
 
@@ -137,7 +144,8 @@ def runExp(*args, **kwargs):
 
             # Write Video Data / Debug Images
             if episodeNum % conf.record_every == 0 and conf.save_debug_images:
-                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg".format(episodeNum, sumGameSteps)
+                recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg"\
+                    .format(episodeNum, sumGameSteps)
                 env.writeScreen(conf.image_dir + recordFrameName)
             if recordScreen:
                 videoLog.setTags(episodeNum, sumGameSteps, pacman.eps, info)
@@ -153,7 +161,8 @@ def runExp(*args, **kwargs):
         logAvgTrainTime.append(timeTrain/sumGameSteps)
         
         if (episodeNum-1) % conf.record_every == 0 and conf.record_games:
-            print('cutting now', episodeNum, 'ep_{0:06d}'.format(episodeNum+conf.record_every-1))
+            print('cutting now', episodeNum, 'ep_{0:06d}'.\
+                format(episodeNum+conf.record_every-1))
             videoLog.cutHere('ep_{0:06d}'.format(episodeNum+conf.record_every-1))
 
         # Print some Status info
@@ -174,7 +183,8 @@ def runExp(*args, **kwargs):
 
         # Occasionally plot intemediate Results
         if (episodeNum + 1) % 100 == 0:
-             plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
+             plotTraining(conf, pacman, logStepsPerGame,\
+                  logAvgStepTime, logAvgTrainTime)
 
 
     # Plot Results
@@ -190,7 +200,8 @@ def runExp(*args, **kwargs):
 def testPacman(pacman, conf, episodeNum):
     # Save Training Params
     trainEps = pacman.eps
-    print(f'testing... (current train eps {trainEps:0.3f}, test eps {conf.test_eps})')
+    print(f'testing... (current train eps {trainEps:0.3f},\
+         test eps {conf.test_eps})')
     pacman.eps = conf.test_eps
 
     # Init Logs
