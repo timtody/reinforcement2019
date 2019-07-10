@@ -94,7 +94,7 @@ class Env:
             self.expConfig.pacman_reward_coin,
             self.expConfig.pacman_reward_no_coin,
             self.expConfig.pacman_reward_ghost,
-            self.grid
+            self.grid_level
         )
         self.player.movespeed = self.expConfig.pacman_movespeed
 
