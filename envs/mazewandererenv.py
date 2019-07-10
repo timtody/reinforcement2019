@@ -24,6 +24,8 @@ class Env:
         self.screen = pygame.display.set_mode((self.SCREEN_SIZE.size), flags)
         self.timer = pygame.time.Clock()
         self.level = Level(levelName)
+        level = self.level.string_representation
+        self.grid_level = np.empty((len(level), len(level[0])))
 
         # sprite groups
         self.playables = pygame.sprite.Group()
@@ -54,9 +56,12 @@ class Env:
         # build the level
         self.numCoins = 0
         x = y = 0
-        for row in self.level.string_representation:
-            for col in row:
+        for i, row in enumerate(self.level.string_representation):
+            for j, col in enumerate(row):
+                # 0 means no wall tile is present
+                self.grid_level[i, j] = 1 if col == "P" else 0
                 if col == "P" and not (x, y) == self.player.rect.topleft and walls:
+                    # 1 for wall tile
                     Wall((x, y), self.platforms)
                 if col == " " and not (x, y) == self.player.rect.topleft:
                     Coin((x, y), self.coins)
@@ -83,14 +88,16 @@ class Env:
         numPoses = len(self.expConfig.pacman_start_poses)
         pacmanPos = self.expConfig.pacman_start_poses[randint(0,numPoses-1)]
         self.player = PacMan(
-            [self.playables, self.entities], self.platforms, self.coins, self.ghosts, 
+            [self.playables, self.entities], self.platforms, self.coins, self.ghosts,
             (self.TILE_SIZE*pacmanPos[0], self.TILE_SIZE*pacmanPos[1]),
             self.expConfig.pacman_lives,
             self.expConfig.pacman_reward_coin,
             self.expConfig.pacman_reward_no_coin,
-            self.expConfig.pacman_reward_ghost)
+            self.expConfig.pacman_reward_ghost,
+            self.grid
+        )
         self.player.movespeed = self.expConfig.pacman_movespeed
-    
+
     def reset(self):
         # delete all current coins and players
         for sprite in self.entities.sprites():
@@ -100,14 +107,14 @@ class Env:
 
         self.init_playables()
         self.setup_level(walls=False)
-    
+
     def set_rewards(self):
         # compute the distance to pacman per ghost
         # todo: implement abstract reward calculation for all entities
         self.ghost.calculate_reward()
         self.ghost2.calculate_reward()
         self.ghost3.calculate_reward()
-    
+
     def get_screen(self, recording):
         # setup return values for render
         screenRaw = pygame.surfarray.array2d(self.screen).T
@@ -118,24 +125,24 @@ class Env:
         screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
         screen = screen/np.max(screen)
         return screen, pixels
-    
+
     def render_text(self):
         # calculate pacmans points and lives
-        surface_points = self.myfont.render(f'points: {self.player.points}', 
+        surface_points = self.myfont.render(f'points: {self.player.points}',
         False, (0, 0, 0))
-        surface_lives = self.myfont.render(f'lives: {self.player.lives}', 
+        surface_lives = self.myfont.render(f'lives: {self.player.lives}',
         False, (0, 0, 0))
         # show points and lives
         self.screen.blit(surface_points,(0,17*self.TILE_SIZE-10))
         self.screen.blit(surface_lives,(256,17*self.TILE_SIZE-10))
-    
+
     def draw_entities(self):
         self.entities.update()
         self.screen.fill((0, 0, 0))
         self.coins.draw(self.screen)
         self.entities.draw(self.screen)
         self.platforms.draw(self.screen)
-    
+
     def configure_outputs(self, screen):
         # here the output dict is filled with relevant values
         self.observation["pacman"] = screen

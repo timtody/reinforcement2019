@@ -1,6 +1,9 @@
 from envs import mazewandererenv
+from default_configs import defaultConfig
+conf = defaultConfig()
 
-env = mazewandererenv.Env()
+env = mazewandererenv.Env(conf)
+print(env.grid_level)
 
 obs, reward, done, info, display = env.render()
 

@@ -20,10 +20,10 @@ def load_image(name, colorkey=None):
 
 def load_images_directional(name):
     """loads images with named directional suffixes
-    
+
     Arguments:
         name {string} -- name
-    
+
     Returns:
         [list] -- [images in order of right, down, left, up]
         [pygame.rect] -- [the corresponding rectangle for position and movement]
@@ -39,24 +39,24 @@ def load_images_directional(name):
     rect = images[0].get_rect()
 
     return images, rect
-    
+
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, *group):
         super().__init__(*group)
         self.lastValidMove = [0,0]
-        
-    
+
+
     def meeting_platform(self, rect):
         for p in self.platforms:
             if pygame.sprite.collide_rect(rect, p):
                 return True
-    
+
     def move(self):
         """moves and checks for collisions with wall tiles. Does not handle
         any collision with coins or other entities,
-        
-        
+
+
         Returns:
             bool -- true if entity is colliding with a wall this frame only
         """
@@ -131,7 +131,10 @@ class Coin(Entity):
 
 
 class PacMan(Entity):
-    def __init__(self, group, platforms, coins, ghosts, pos, lives, coinReward, noCoinReward, ghostColReward):
+    def __init__(self, group, platforms,
+                 coins, ghosts, pos,
+                 lives, coinReward, noCoinReward,
+                 ghostColReward, grid):
         super().__init__(group)
         self.lives = lives
         self.points = 0
@@ -153,7 +156,13 @@ class PacMan(Entity):
         self.coinReward = coinReward
         self.noCoinReward = noCoinReward
         self.ghostColReward = ghostColReward
-    
+
+    def get_legal_actions(self):
+        pass
+
+    def get_world_coordinates(self):
+        pass
+
     def rotate(self):
         if self.action == ActionSpace.RIGHT:
             self.image = self.images[0]
@@ -163,12 +172,12 @@ class PacMan(Entity):
             self.image = self.images[3]
         if self.action == ActionSpace.DOWN:
             self.image = self.images[1]
-        
+
     def update(self):
         self.reward = self.noCoinReward
         # undo rotation from previous game step
         #self.rotate(-self.rotation_angle)
-        
+
         # set the movement parameters of the agent
         if self.action == self.ActionSpace.IDLE:
             move_h = 0
@@ -195,8 +204,8 @@ class PacMan(Entity):
         # horizontal collision and movement 
         self.move()
         self.rotate()
-        
-        
+
+
         # check for coins
         for c in self.coins:
             if pygame.sprite.collide_rect(self, c):
