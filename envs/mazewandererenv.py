@@ -10,7 +10,11 @@ from PIL import Image
 from random import randint
 
 class Env:
-    def __init__(self, expConfig, config=BaseConfig, levelName='Full'):
+    def __init__(self, expConfig, 
+                 config=BaseConfig, 
+                 levelName='Full', 
+                 manual_test=False):
+        
         flags = DOUBLEBUF
         pygame.init()
         pygame.font.init()
@@ -21,11 +25,13 @@ class Env:
         self.SCREEN_SIZE = pygame.Rect(config.SCREEN_SIZE)
         self.action_space = ActionSpace
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
-        self.screen = pygame.display.set_mode((self.SCREEN_SIZE.size), flags)
+        self.screen = pygame.display.set_mode(
+            (self.SCREEN_SIZE.size), 
+            flags)
         self.timer = pygame.time.Clock()
         self.level = Level(levelName)
         level = self.level.string_representation
-        self.grid_level = np.empty((len(level), len(level[0])))
+        self.grid_level = np.empty((len(level), len(level[0])), dtype=np.int)
 
         # sprite groups
         self.playables = pygame.sprite.Group()
@@ -49,10 +55,16 @@ class Env:
 
         # max achievable score
         self.total_coins = len(self.coins)
+        
+        # manual testing
+        self.manual = manual_test
+        self.clock = pygame.time.Clock()
 
     def setup_level(self, walls=True):
-        level_width = len(self.level.string_representation[0])*self.TILE_SIZE
-        level_height = len(self.level.string_representation)*self.TILE_SIZE
+        level_width = len(
+            self.level.string_representation[0])*self.TILE_SIZE
+        level_height = len(
+            self.level.string_representation)*self.TILE_SIZE
         # build the level
         self.numCoins = 0
         x = y = 0
@@ -162,8 +174,28 @@ class Env:
         # calculate score
         score = self.total_coins - len(self.coins)
         self.info["player"]["score"] = score
+    
+    def manual_control(self):
+        pressed = pygame.key.get_pressed()
+        self.player.action = self.key_to_actionspace(pressed)
+    
+    def key_to_actionspace(self, pressed):
+        if pressed[pygame.K_w]:
+            return self.player.ActionSpace(0)
+        elif pressed[pygame.K_s]:
+            return self.player.ActionSpace(1)
+        elif pressed[pygame.K_a]:
+            return self.player.ActionSpace(2)
+        elif pressed[pygame.K_d]:
+            return self.player.ActionSpace(3)
+        else:
+            return self.player.ActionSpace(4)
+        
 
     def render(self, update_display=False, render_text=False, recording=False):
+        if self.manual:
+            self.manual_control()
+            self.clock.tick_busy_loop(15)
         for e in pygame.event.get():
             if e.type == QUIT:
                 sys.exit()

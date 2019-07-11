@@ -51,7 +51,33 @@ class Entity(pygame.sprite.Sprite):
         for p in self.platforms:
             if pygame.sprite.collide_rect(rect, p):
                 return True
-
+    
+    def check_if_current_action_legal(self):
+        """ returns true if current action is legal
+        i.e. the selected action will not run is into a wall """
+        if self.get_grid_entries_for_next_action() == 0:
+            return True
+        else:
+            return False
+    
+    def get_grid_entries_for_next_action(self):
+        """ returns 0 if current action will be valid, 1 else """
+        rel_pos = self.get_relative_position()
+        new_pos = self.add_tuples(rel_pos, self.action.get_dir())
+        # indices have to be swapped here because of ingame x,y representation
+        tile = self.grid[new_pos[1], new_pos[0]]
+        return tile
+    
+    def get_relative_position(self):
+        """ computes world coordinates to grid coordinates """
+        pos = self.rect.topleft
+        rel_pos = [pos[0] // 32, pos[1] // 32]
+        return rel_pos
+    
+    def add_tuples(self, tupa, tupb):
+        """ simply does a broadcast add numpy style for shitty python tuples """
+        return (tupa[0] + tupb[0], tupa[1] + tupb[1])
+    
     def move(self):
         """moves and checks for collisions with wall tiles. Does not handle
         any collision with coins or other entities,
@@ -145,6 +171,8 @@ class PacMan(Entity):
         self.movespeed = 32
         self.hsp = 0
         self.vsp = 0
+        self.move_h = 0
+        self.move_v = 0
         self.rotation_angle = 0
         self.platforms = platforms
         self.coins = coins
@@ -156,12 +184,7 @@ class PacMan(Entity):
         self.coinReward = coinReward
         self.noCoinReward = noCoinReward
         self.ghostColReward = ghostColReward
-
-    def get_legal_actions(self):
-        pass
-
-    def get_world_coordinates(self):
-        pass
+        self.grid = grid
 
     def rotate(self):
         if self.action == ActionSpace.RIGHT:
@@ -172,36 +195,38 @@ class PacMan(Entity):
             self.image = self.images[3]
         if self.action == ActionSpace.DOWN:
             self.image = self.images[1]
-
+    
+    def filter_legal_actions(self):
+        if not self.check_if_current_action_legal():
+            self.action = self.ActionSpace.IDLE
+            
     def update(self):
+        self.filter_legal_actions()
         self.reward = self.noCoinReward
-        # undo rotation from previous game step
-        #self.rotate(-self.rotation_angle)
 
         # set the movement parameters of the agent
         if self.action == self.ActionSpace.IDLE:
-            move_h = 0
-            move_v = 0
-        if self.action == self.ActionSpace.UP:
-            move_h = 0
-            move_v = -1
-            #self.rotate(90)
-        if self.action == self.ActionSpace.DOWN:
-            move_h = 0
-            move_v = 1
-            #self.rotate(270)
-        if self.action == self.ActionSpace.LEFT:
-            move_h = -1
-            move_v = 0
-            #self.rotate(180)
-        if self.action == self.ActionSpace.RIGHT:
-            move_h = 1
-            move_v = 0
-            #self.rotate(0)
+            # placeholder
+            pass
+        elif self.action == self.ActionSpace.UP:
+            self.move_h = 0
+            self.move_v = -1
+        elif self.action == self.ActionSpace.DOWN:
+            self.move_h = 0
+            self.move_v = 1
+        elif self.action == self.ActionSpace.LEFT:
+            self.move_h = -1
+            self.move_v = 0
+        elif self.action == self.ActionSpace.RIGHT:
+            self.move_h = 1
+            self.move_v = 0
 
-        self.hsp = move_h*self.movespeed
-        self.vsp = move_v*self.movespeed
-        # horizontal collision and movement 
+        self.hsp = self.move_h*self.movespeed
+        self.vsp = self.move_v*self.movespeed
+        # horizontal collision and movement
+        rel_pos = self.get_relative_position()
+        
+        print(self.check_if_current_action_legal())
         self.move()
         self.rotate()
 
