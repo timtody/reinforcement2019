@@ -84,7 +84,7 @@ def defaultConfig():
     rc.pacman_reward_coin = 10
     rc.pacman_reward_no_coin = -1
 
-    rc.pacman_reward_ghost = -100
+    rc.pacman_reward_ghost = -10
     rc.pacman_rewad_illegal_action = -5
 
     rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
