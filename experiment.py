@@ -1,14 +1,9 @@
 import plotter
-import os
 import numpy as np
 from time import time
 from library import inout, config, agents, models
 from default_configs import defaultConfig, pacmanNetConfig
 from envs import mazewandererenv, replaybuffer
-
-# work around for my broken install
-os.environ['KMP_DUPLICATE_LIB_OK']='True' 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 def runExp(*args, **kwargs):
     # Setup Config
