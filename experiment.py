@@ -166,11 +166,8 @@ def runExp(*args, **kwargs):
                                timeStepGame/sumGameSteps))
         
         # Prepare agents for next game round
-<<<<<<< Updated upstream
-        if trainingPacman:
-=======
+
         if (episodeNum // conf.n_games_per_agent) % 2 == 0:
->>>>>>> Stashed changes
             pacman.prepForNextGame()
             ghost1.prepForNextGame(decayEps=False)
         else:
