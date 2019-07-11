@@ -79,12 +79,13 @@ def defaultConfig():
     rc.use_trained_pacman = False
 
     # Game Parameters
-    rc.ghost_speed = 0
+    rc.ghost_speed = 32
     rc.pacman_reward_type = 0 # Options: 0=reward, 1=rewardSum, 2=rewardsum/maxreward
     rc.pacman_lives = 3
     rc.pacman_reward_coin = 10
     rc.pacman_reward_no_coin = -1
     rc.pacman_reward_ghost = -10
+    rc.pacman_rewad_illegal_action = -5
     rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
     rc.pacman_movespeed = 32
     rc.max_steps_per_game = 4000

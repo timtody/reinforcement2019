@@ -86,7 +86,7 @@ class Env:
         # playables
         self.ghost = Ghost(
             [self.ghosts, self.entities], self.platforms, self.playables,
-            (self.TILE_SIZE*8, self.TILE_SIZE*8),
+            (self.TILE_SIZE*1, self.TILE_SIZE*3),
             self.expConfig.ghost_speed,
             self.grid_level)
         self.ghost2 = Ghost(
@@ -180,7 +180,7 @@ class Env:
     
     def manual_control(self):
         pressed = pygame.key.get_pressed()
-        self.player.action = self.key_to_actionspace(pressed)
+        self.ghost.action = self.key_to_actionspace(pressed)
     
     def key_to_actionspace(self, pressed):
         if pressed[pygame.K_w]:
@@ -193,12 +193,11 @@ class Env:
             return self.player.ActionSpace(3)
         else:
             return self.player.ActionSpace(4)
-        
 
     def render(self, update_display=False, render_text=False, recording=False):
         if self.manual:
             self.manual_control()
-            self.clock.tick_busy_loop(15)
+            self.clock.tick(12)
         for e in pygame.event.get():
             if e.type == QUIT:
                 sys.exit()

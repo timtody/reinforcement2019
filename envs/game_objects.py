@@ -46,7 +46,6 @@ class Entity(pygame.sprite.Sprite):
         super().__init__(*group)
         self.lastValidMove = [0,0]
 
-
     def meeting_platform(self, rect):
         for p in self.platforms:
             if pygame.sprite.collide_rect(rect, p):
@@ -84,6 +83,13 @@ class Entity(pygame.sprite.Sprite):
         cur_pos = self.get_relative_position()
         next_pos = self.add_tuples([self.move_h, self.move_v], cur_pos)
         return self.grid[next_pos[1], next_pos[0]]
+    
+    def filter_legal_actions(self):
+        if not self.check_if_current_action_legal():
+            self.action = self.ActionSpace.IDLE
+            self.taken_illegal_action = True
+        else:
+            self.taken_illegal_action = False
     
     def grid_move(self):
         collision = False
@@ -202,6 +208,7 @@ class PacMan(Entity):
         self.grid = grid
         self.has_collected_coin = False
         self.has_been_caught = False
+        self.taken_illegal_action = False
 
     def rotate(self):
         if self.action == ActionSpace.RIGHT:
@@ -213,17 +220,14 @@ class PacMan(Entity):
         if self.action == ActionSpace.DOWN:
             self.image = self.images[1]
     
-    def filter_legal_actions(self):
-        if not self.check_if_current_action_legal():
-            self.action = self.ActionSpace.IDLE
-            
     def update(self):
+        # gets called every frame by the engine
         self.filter_legal_actions()
         
         self.set_movement()
         
         # actually do movement
-        self.grid_move()
+        self.move()
         self.rotate()
 
         # check for coins
@@ -249,16 +253,25 @@ class PacMan(Entity):
         # pacman recieves a negative reward for being caught
         if self.has_been_caught:
             self.reward += self.ghostColReward
+        
+        # pacman gets negative reward for trying to
+        # execute illegal actions 
+        if self.taken_illegal_action:
+            self.reward += -10
             
         if self.lost:
-            self.reward -= 100        
+            self.reward -= 100
+        
+        return self.reward
     
     def check_for_coins(self):
         for c in self.coins:
             if pygame.sprite.collide_rect(self, c):
                 c.kill()
                 self.points += 1
-                break
+                self.has_collected_coin = 1
+                return
+        self.has_collected_coin = 0
     
     def check_for_ghosts(self):
         for g in self.ghosts:
@@ -269,7 +282,10 @@ class PacMan(Entity):
                 self.rect.topleft = self.start
                 for g in self.ghosts:
                     g.rect.topleft = g.start
-                break
+                return
+            else:
+                g.caught_pacman = False
+        self.has_been_caught = False
     
     def check_for_lives(self):
         # check for lives
@@ -320,6 +336,7 @@ class Ghost(Entity):
         self.is_collided = False
         self.caught_pacman = False
         self.grid = grid
+        self.taken_illegal_action = False
         
     def distance_to_pacman(self):
         pacman = self.pacman.sprites()[0]
@@ -330,32 +347,39 @@ class Ghost(Entity):
         return dist
     
     def calculate_reward(self):
-        normalized_distance = self.distance_to_pacman() / 1000
+        normalized_distance = self.distance_to_pacman() / 100
         self.reward = -normalized_distance
-        if self.is_collided: self.reward -= 1
-        if self.caught_pacman: self.reward += 10
+        if self.taken_illegal_action: 
+            self.reward -= 10
+        if self.caught_pacman: 
+            self.reward += 100
 
     def update(self):
-        if self.action == self.ActionSpace.IDLE:
-            move_h = 0
-            move_v = 0
-        if self.action == self.ActionSpace.UP:
-            move_h = 0
-            move_v = -1
-        if self.action == self.ActionSpace.DOWN:
-            move_h = 0
-            move_v = 1
-        if self.action == self.ActionSpace.LEFT:
-            move_h = -1
-            move_v = 0
-        if self.action == self.ActionSpace.RIGHT:
-            move_h = 1
-            move_v = 0
-
-        self.hsp = move_h*self.movespeed
-        self.vsp = move_v*self.movespeed
-
+        self.filter_legal_actions()
+        self.set_movement()
         # horizontal collision and movement
         # check if a collision has happened
-        self.is_collided = self.move()
+
+        self.grid_move()
         self.calculate_reward()
+        #print(f"ghost reward is: {self.reward}")
+    
+    def set_movement(self):
+        if self.action == self.ActionSpace.IDLE:
+            self.move_h = self.move_h
+            self.move_v = self.move_v
+        elif self.action == self.ActionSpace.UP:
+            self.move_h = 0
+            self.move_v = -1
+        elif self.action == self.ActionSpace.DOWN:
+            self.move_h = 0
+            self.move_v = 1
+        elif self.action == self.ActionSpace.LEFT:
+            self.move_h = -1
+            self.move_v = 0
+        elif self.action == self.ActionSpace.RIGHT:
+            self.move_h = 1
+            self.move_v = 0
+        
+        self.hsp = self.move_h*self.movespeed
+        self.vsp = self.move_v*self.movespeed
