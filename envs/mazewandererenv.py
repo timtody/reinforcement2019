@@ -138,7 +138,7 @@ class Env:
         else:
             pixels = None
         screen = np.array(Image.fromarray(screenRaw).resize((80,72),Image.NEAREST))
-        screen = screen/np.max(screen)
+        screen = screen/16449355#np.max(screen)
         return screen, pixels
 
     def render_text(self):
