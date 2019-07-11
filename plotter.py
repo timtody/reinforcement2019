@@ -4,12 +4,9 @@ import numpy as np
 def pacmanAgentReward(conf, rewardPerGame):
     x = list(range(1,len(rewardPerGame)+1))
     
-    fig = plt.figure()
-    fig, ax1 = plt.subplots()
-    
-    ax1.plot(x, rewardPerGame)
-    ax1.set_ylabel('Reward')
-    ax1.set_xlabel("Game")
+    plt.plot(x, rewardPerGame)
+    plt.ylabel('Reward')
+    plt.xlabel("Game")
     
     plt.title("Reward: Pacman Agent")
     plt.xlim((1,len(rewardPerGame)))
@@ -20,16 +17,13 @@ def pacmanAgentReward(conf, rewardPerGame):
     if conf.show_plots:
         plt.show()
     
-    plt.close(fig)
+    plt.close()
 
 def pacmanAgentSteps(conf, stepsPerGame):
     x = list(range(1,len(stepsPerGame)+1))
     
-    fig = plt.figure()
-    fig, ax1 = plt.subplots()
-    
-    ax1.plot(x, stepsPerGame, 'orangered')
-    ax1.set_ylabel('Steps')
+    plt.plot(x, stepsPerGame, 'orangered')
+    plt.ylabel('Steps')
     
     plt.title("Steps per Game")
     plt.xlim((1,len(stepsPerGame)))
@@ -40,16 +34,13 @@ def pacmanAgentSteps(conf, stepsPerGame):
     if conf.show_plots:
         plt.show()
     
-    plt.close(fig)
+    plt.close()
     
-def times(conf, avgStepTime, avgTrainTime):
+def times(conf, avgStepTime):
     x = list(range(1,len(avgStepTime)+1))
 
-    fig = plt.figure()
-
     plt.plot(avgStepTime)
-    plt.plot(avgTrainTime)
-    plt.legend(["Avg. Time per Game Step", "Avg. Time per Fit"])
+    plt.legend(["Avg. Time per Game Step"])
     plt.title("Times")
     plt.ylabel("time[s]")
     plt.xlabel("Game")
@@ -60,12 +51,11 @@ def times(conf, avgStepTime, avgTrainTime):
     if conf.show_plots:
         plt.show()
     
-    plt.close(fig)
+    plt.close()
 
 def modelLoss(conf, loss, modelName):
-    fig = plt.figure()
     plt.plot(loss)
-    plt.title(modelName)
+    plt.title("Model loss: " + modelName)
     plt.ylabel("loss")
     plt.xlabel("train step")
 
@@ -75,10 +65,9 @@ def modelLoss(conf, loss, modelName):
     if conf.show_plots:
         plt.show()
     
-    plt.close(fig)
+    plt.close()
 
 def pacmanTestReward(conf, log):
-    fig = plt.figure()
     plt.title('Test Reward')
     plt.ylabel('Reward')
     plt.xlabel('Game')
@@ -95,9 +84,10 @@ def pacmanTestReward(conf, log):
     if conf.show_plots:
         plt.show()
 
+    plt.close()
+
 
 def pacmanTestSteps(conf, log):
-    fig = plt.figure()
     plt.title('Test Steps')
     plt.ylabel('Steps')
     plt.xlabel('Game')
@@ -113,4 +103,5 @@ def pacmanTestSteps(conf, log):
 
     if conf.show_plots:
         plt.show()
-
+    
+    plt.close()
