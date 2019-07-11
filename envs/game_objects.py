@@ -78,6 +78,24 @@ class Entity(pygame.sprite.Sprite):
         """ simply does a broadcast add numpy style for shitty python tuples """
         return (tupa[0] + tupb[0], tupa[1] + tupb[1])
     
+    def get_id_of_next_grid_pos(self):
+        """ factors in hsp and vsp to calculate the id
+        of the tile which would be visited next step"""
+        cur_pos = self.get_relative_position()
+        next_pos = self.add_tuples([self.move_h, self.move_v], cur_pos)
+        return self.grid[next_pos[1], next_pos[0]]
+    
+    def grid_move(self):
+        collision = False
+        # collision and movement
+        if self.get_id_of_next_grid_pos() == 1:
+            self.move_h = self.move_v = 0
+            self.hsp = self.vsp = 0
+            collision = True
+        self.rect = self.rect.move([self.hsp, self.vsp])
+        
+        return collision
+    
     def move(self):
         """moves and checks for collisions with wall tiles. Does not handle
         any collision with coins or other entities,
@@ -115,9 +133,6 @@ class Entity(pygame.sprite.Sprite):
             self.hsp = 0
         else:
             hspValid = True
-
-        #self.rect = self.rect.move([self.hsp, 0])
-
         # vertical collision and movement
         if self.meeting_platform(self.rect.move([0, self.vsp])):
             while not self.meeting_platform(self.rect.move([0, np.sign(self.vsp)])):
@@ -185,6 +200,8 @@ class PacMan(Entity):
         self.noCoinReward = noCoinReward
         self.ghostColReward = ghostColReward
         self.grid = grid
+        self.has_collected_coin = False
+        self.has_been_caught = False
 
     def rotate(self):
         if self.action == ActionSpace.RIGHT:
@@ -202,8 +219,64 @@ class PacMan(Entity):
             
     def update(self):
         self.filter_legal_actions()
-        self.reward = self.noCoinReward
+        
+        self.set_movement()
+        
+        # actually do movement
+        self.grid_move()
+        self.rotate()
 
+        # check for coins
+        self.check_for_coins()
+        
+        # check for collision with ghosts
+        self.check_for_ghosts()
+        
+        # check if all lives were lost
+        self.check_for_lives()
+        
+        # calculate reward at the end of updateo
+        self.calculate_reward()
+        
+    def calculate_reward(self):
+        self.reward = 0
+        # pacman recieves a positive reward for collecting coins
+        if self.has_collected_coin:
+            self.reward += self.coinReward
+        else:
+            self.reward += self.noCoinReward
+        
+        # pacman recieves a negative reward for being caught
+        if self.has_been_caught:
+            self.reward += self.ghostColReward
+            
+        if self.lost:
+            self.reward -= 100        
+    
+    def check_for_coins(self):
+        for c in self.coins:
+            if pygame.sprite.collide_rect(self, c):
+                c.kill()
+                self.points += 1
+                break
+    
+    def check_for_ghosts(self):
+        for g in self.ghosts:
+            if pygame.sprite.collide_rect(self, g):
+                self.lives -= 1
+                self.has_been_caught = True
+                g.caught_pacman = True
+                self.rect.topleft = self.start
+                for g in self.ghosts:
+                    g.rect.topleft = g.start
+                break
+    
+    def check_for_lives(self):
+        # check for lives
+        if self.lives == 0:
+            self.lost = True
+    
+    def set_movement(self):
         # set the movement parameters of the agent
         if self.action == self.ActionSpace.IDLE:
             # placeholder
@@ -223,40 +296,13 @@ class PacMan(Entity):
 
         self.hsp = self.move_h*self.movespeed
         self.vsp = self.move_v*self.movespeed
-        # horizontal collision and movement
-        rel_pos = self.get_relative_position()
-        
-        print(self.check_if_current_action_legal())
-        self.move()
-        self.rotate()
-
-
-        # check for coins
-        for c in self.coins:
-            if pygame.sprite.collide_rect(self, c):
-                c.kill()
-                self.points += 1
-                self.reward = self.coinReward
-                break
-        
-        # check for collision with ghosts
-        for g in self.ghosts:
-            if pygame.sprite.collide_rect(self, g):
-                self.lives -= 1
-                self.reward = self.ghostColReward
-                g.caught_pacman = True
-                self.rect.topleft = self.start
-                for g in self.ghosts:
-                    g.rect.topleft = g.start
-                break
-        
-        # check for lives
-        if self.lives == 0:
-            self.lost = True
 
 
 class Ghost(Entity):
-    def __init__(self, group, platforms, playables, pos, movespeed):
+    def __init__(self, group, 
+                 platforms, playables, 
+                 pos, movespeed,
+                 grid):
         super().__init__(group)
         self.image, self.rect = load_image('ghost.png')
         self.start = pos
@@ -264,6 +310,8 @@ class Ghost(Entity):
         self.movespeed = movespeed
         self.hsp = 0
         self.vsp = 0
+        self.move_h = 0
+        self.move_v = 0
         self.platforms = platforms
         self.ActionSpace = ActionSpace
         self.action = ActionSpace.IDLE
@@ -271,7 +319,8 @@ class Ghost(Entity):
         self.reward = 0
         self.is_collided = False
         self.caught_pacman = False
-    
+        self.grid = grid
+        
     def distance_to_pacman(self):
         pacman = self.pacman.sprites()[0]
         ghost_pos = np.array(self.rect.topleft)

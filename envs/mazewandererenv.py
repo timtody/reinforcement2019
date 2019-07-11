@@ -87,15 +87,18 @@ class Env:
         self.ghost = Ghost(
             [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*8, self.TILE_SIZE*8),
-            self.expConfig.ghost_speed)
+            self.expConfig.ghost_speed,
+            self.grid_level)
         self.ghost2 = Ghost(
             [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*9, self.TILE_SIZE*8),
-            self.expConfig.ghost_speed)
+            self.expConfig.ghost_speed,
+            self.grid_level)
         self.ghost3 = Ghost(
             [self.ghosts, self.entities], self.platforms, self.playables,
             (self.TILE_SIZE*10, self.TILE_SIZE*8),
-            self.expConfig.ghost_speed)
+            self.expConfig.ghost_speed,
+            self.grid_level)
         # Random Start Position
         numPoses = len(self.expConfig.pacman_start_poses)
         pacmanPos = self.expConfig.pacman_start_poses[randint(0,numPoses-1)]
