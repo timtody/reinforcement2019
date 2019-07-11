@@ -101,7 +101,8 @@ def runExp(*args, **kwargs):
             timeStepGame += time()-startTime
             
             if (episodeNum // conf.n_games_per_agent) % 2 == 0:
-                #training pac man for n_games_per_agent episodes       
+                #training pac man for n_games_per_agent episodes
+                trainingPacman = True       
                 pacman.storeExperience(
                     state,
                     newState, 
@@ -117,7 +118,8 @@ def runExp(*args, **kwargs):
                     print('Performed a Pacman training\
                          step in',time()-startTime,'seconds.')
             else:
-                # train ghost for n_games_per_agent episodes    
+                # train ghost for n_games_per_agent episodes   
+                trainingPacman = False 
                 ghost1.storeExperience(
                     state, 
                     newState, 
@@ -169,7 +171,7 @@ def runExp(*args, **kwargs):
                                timeStepGame/sumGameSteps))
         
         # Prepare agents for next game round
-        if episodeNum < conf.pacman_train_limit:
+        if trainingPacman:
             pacman.prepForNextGame()
             ghost1.prepForNextGame(decayEps=False)
         else:
