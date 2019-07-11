@@ -22,7 +22,6 @@ def runExp(*args, **kwargs):
     # Init Logs # Todo: replace with preallocated arrays 
     logStepsPerGame = []
     logAvgStepTime = []
-    logAvgTrainTime = []
     sumExperiences = 0
 
     logTestAvgReward = []
@@ -55,7 +54,7 @@ def runExp(*args, **kwargs):
     # Run
     print("Training...")
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f}\
-                timeStepGame={4:3.4f}s timeTrainNet={5:3.4f}s"
+                timeStepGame={4:3.4f}s"
     for episodeNum in range(conf.num_episodes):
 
         if conf.run_validation and episodeNum % conf.test_every == 0:
@@ -76,7 +75,7 @@ def runExp(*args, **kwargs):
 
         # (Re-)set game vars
         done = False
-        sumGameSteps = timeStepGame = timeTrain = 0
+        sumGameSteps = timeStepGame = 0
         # Record first frame
         if recordScreen:
             videoLog.setTags(episodeNum, sumGameSteps, pacman.eps, info)
@@ -100,7 +99,7 @@ def runExp(*args, **kwargs):
             startTime = time()
             newState, reward, done, info, display = stepEnv(conf, env, recordScreen)
             timeStepGame += time()-startTime
-            startTime = time()
+            
             if (episodeNum // conf.n_games_per_agent) % 2 == 0:
                 #training pac man for n_games_per_agent episodes       
                 pacman.storeExperience(
@@ -132,8 +131,6 @@ def runExp(*args, **kwargs):
                     ghost1.train()
                     print('Performed a Ghost training\
                          step in',time()-startTime,'seconds.')
-            
-            timeTrain += time()-startTime
 
             # Prepare for next round
             state = newState
@@ -158,7 +155,6 @@ def runExp(*args, **kwargs):
         # Log
         logStepsPerGame.append((sumGameSteps))
         logAvgStepTime.append(timeStepGame/sumGameSteps)
-        logAvgTrainTime.append(timeTrain/sumGameSteps)
         
         if (episodeNum-1) % conf.record_every == 0 and conf.record_games:
             print('cutting now', episodeNum, 'ep_{0:06d}'.\
@@ -170,8 +166,7 @@ def runExp(*args, **kwargs):
                                conf.num_episodes,
                                sumGameSteps,
                                pacman.rewardSum,
-                               timeStepGame/sumGameSteps,
-                               timeTrain/sumGameSteps))
+                               timeStepGame/sumGameSteps))
         
         # Prepare agents for next game round
         if episodeNum < conf.pacman_train_limit:
@@ -184,11 +179,11 @@ def runExp(*args, **kwargs):
         # Occasionally plot intemediate Results
         if (episodeNum + 1) % 100 == 0:
              plotTraining(conf, pacman, logStepsPerGame,\
-                  logAvgStepTime, logAvgTrainTime)
+                  logAvgStepTime)
 
 
     # Plot Results
-    plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime)
+    plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime)
     videoLog.finalize()
 
     # Save Models
@@ -274,16 +269,18 @@ def stepEnv(conf, env, recordScreen):
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info, display
 
-def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime, logAvgTrainTime):
+def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime):
     plotter.pacmanAgentReward(conf, 
                             pacman.rewardLog)
+    
+    #rewardLogSmooth = np.convolve(pacman.rewardLog, np.ones((100,))/100, mode='valid')
+    #plotter.pacmanAgentReward(conf, rewardLogSmooth)
 
     plotter.pacmanAgentSteps(conf, 
                             logStepsPerGame)
 
     plotter.times(conf,
-                  logAvgStepTime, 
-                  logAvgTrainTime)
+                  logAvgStepTime)
     
     plotter.modelLoss(conf,
                       pacman.lossLog,
