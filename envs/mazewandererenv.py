@@ -160,6 +160,9 @@ class Env:
 
     def configure_outputs(self, screen):
         # here the output dict is filled with relevant values
+        if len(self.coins) == 0:
+            self.player.collected_all_coins = True
+            
         self.observation["pacman"] = screen
         self.observation["ghosts"][0] = screen
         self.observation["ghosts"][1] = screen

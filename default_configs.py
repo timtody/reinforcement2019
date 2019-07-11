@@ -21,7 +21,7 @@ def pacmanNetConfig():
     # Q-Learning Parameters
     rc.y = 0.95
     rc.eps = 0.5
-    rc.decay_factor = 0.9999
+    rc.decay_factor = 0.99
 
     rc.replay_buffer_size = 1500
     rc.train_batch_size = 1500
@@ -83,8 +83,13 @@ def defaultConfig():
     rc.pacman_lives = 3
     rc.pacman_reward_coin = 10
     rc.pacman_reward_no_coin = -1
+<<<<<<< Updated upstream
     rc.pacman_reward_ghost = -10
     rc.pacman_reward_illegal_action = -5
+=======
+    rc.pacman_reward_ghost = -100
+    rc.pacman_rewad_illegal_action = -5
+>>>>>>> Stashed changes
     rc.pacman_max_reward_per_game = 1310 # Is overwritten by actual possible max reward
     rc.pacman_movespeed = 32
     rc.max_steps_per_game = 4000

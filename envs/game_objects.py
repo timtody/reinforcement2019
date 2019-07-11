@@ -209,6 +209,7 @@ class PacMan(Entity):
         self.has_collected_coin = False
         self.has_been_caught = False
         self.taken_illegal_action = False
+        self.collected_all_coins = False
 
     def rotate(self):
         if self.action == ActionSpace.RIGHT:
@@ -260,7 +261,10 @@ class PacMan(Entity):
             self.reward += -10
             
         if self.lost:
-            self.reward -= 100
+            self.reward -= 1000
+        
+        if self.collected_all_coins:
+            self.reward += 1000
         
         return self.reward
     
