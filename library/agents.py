@@ -22,6 +22,9 @@ class Agent():
 
         if printSummary:
             self.model.summary()
+        
+        if self.conf.write_conf:
+            self.agentConf.writeConfigToDisk(self.conf.log_dir+self.name+"_")
 
         self.trainDelay = self.agentConf.num_train_after_experiences
     
