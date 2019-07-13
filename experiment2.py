@@ -20,6 +20,7 @@ class Experiment():
         # Init Experiment Environment
         self.__createLogDirs__()
         self.__createLoggers__()
+        self.episodeNum = 0
 
         # Init Game Environment
         self.gameRunner = mazewandererenv.Env(self.conf, levelName=self.conf.start_level_name)
@@ -145,11 +146,62 @@ class Experiment():
             self.ghost1.prepForNextGame()
         
         # Occasionally plot intermediate Results
-        if (self.self.episodeNum + 1) % 100 == 0:
+        if (self.episodeNum + 1) % 100 == 0:
              self.plotTraining()
         
         self.episodeNum += 1
-        
+
+    def postOneStep(self, recordScreen, display, info):
+        # Logging
+        self.sumGameSteps += 1
+        self.sumExperiences += 1
+
+        # Write Video Data / Debug Images
+        if self.episodeNum % self.conf.record_every == 0 and self.conf.save_debug_images:
+            recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg"\
+                .format(episodeNum, self.sumGameSteps)
+            self.gameRunner.writeScreen(self.conf.image_dir + recordFrameName)
+        if recordScreen:
+            self.videoLog.setTags(self.episodeNum, self.sumGameSteps, self.pacman.eps, info)
+            self.videoLog.appendFrame(display)
+
+        # Break if max steps reached
+        if self.sumGameSteps == self.conf.max_steps_per_game:
+            self.gameDone = True
+
+    def trainPacman(self, state, newState, action, reward):
+        self.trainingPacman = True       
+        self.pacman.storeExperience(
+            state,
+            newState, 
+            action, 
+            reward["pacman"], 
+            self.conf.pacman_reward_type)
+        # dirty: log experience for ghost here
+        # todo: find a better way of designing 
+        # the adversarial architecture
+        self.ghost1.rewardSum += reward["ghosts"][0]
+        if self.pacman.trainBuffer.full():
+            self.pacman.train()
+            print('Performed a Pacman training\
+                 step in',time()-startTime,'seconds.')
+
+    def trainGhosts(self, state, newState, ghostActions, reward):
+        self.trainingPacman = False 
+        self.ghost1.storeExperience(
+            state, 
+            newState, 
+            ghostActions[0], 
+            reward["ghosts"][0])
+        # dirty: log experience for pacman here
+        # todo: find a better way of designing
+        # the adversarial architecture
+        self.pacman.rewardSum += reward["pacman"]
+        if self.ghost1.trainBuffer.full():
+            self.ghost1.train()
+            print('Performed a Ghost training\
+                 step in',time()-startTime,'seconds.')
+
     def run(self):
         print("Training...")
         for episodeNum in range(self.conf.num_episodes):
@@ -161,69 +213,30 @@ class Experiment():
                 action = self.pacman.getAction(state)
                 self.gameRunner.player.action = self.gameRunner.player.ActionSpace(action)
 
-                # Non Random Ghosts
-                actionGhost1 = self.ghost1.getAction(state)
-                self.gameRunner.ghost.action = self.gameRunner.ghost.ActionSpace(actionGhost1)
+                # Ghosts
+                ghostActions = [self.ghost1.getAction(state)]#,
+                                #self.ghost2.getAction(state),
+                                #self.ghost3.getAction(state)]
+                self.gameRunner.ghost.action = self.gameRunner.ghost.ActionSpace(ghostActions[0])
 
                 # Step game and collect reward
                 startTime = time()
                 newState, reward, self.gameDone, info, display = self.stepEnv(recordScreen)
                 self.timeStepGame += time()-startTime
-
+                
+                # Train Pacman or the Ghosts
                 if (episodeNum // self.conf.n_games_per_agent) % 2 == 0:
                     #training pac man for n_games_per_agent episodes
-                    self.trainingPacman = True       
-                    self.pacman.storeExperience(
-                        state,
-                        newState, 
-                        action, 
-                        reward["pacman"], 
-                        self.conf.pacman_reward_type)
-                    # dirty: log experience for ghost here
-                    # todo: find a better way of designing 
-                    # the adversarial architecture
-                    self.ghost1.rewardSum += reward["ghosts"][0]
-                    if self.pacman.trainBuffer.full():
-                        self.pacman.train()
-                        print('Performed a Pacman training\
-                             step in',time()-startTime,'seconds.')
+                    self.trainingPacman(state, newState, action, reward)
                 else:
                     # train ghost for n_games_per_agent episodes   
-                    self.trainingPacman = False 
-                    self.ghost1.storeExperience(
-                        state, 
-                        newState, 
-                        actionGhost1, 
-                        reward["ghosts"][0])
-                    # dirty: log experience for pacman here
-                    # todo: find a better way of designing
-                    # the adversarial architecture
-                    self.pacman.rewardSum += reward["pacman"]
-                    if self.ghost1.trainBuffer.full():
-                        self.ghost1.train()
-                        print('Performed a Ghost training\
-                             step in',time()-startTime,'seconds.')
+                    self.train(state, newState, ghostActions, reward)
 
                 # Prepare for next round
                 state = newState
-
-                # Logging
-                self.sumGameSteps += 1
-                self.sumExperiences += 1
-
-                # Write Video Data / Debug Images
-                if episodeNum % self.conf.record_every == 0 and self.conf.save_debug_images:
-                    recordFrameName = "screen_ep{0:07d}_frame{1:05d}.jpg"\
-                        .format(episodeNum, self.sumGameSteps)
-                    self.gameRunner.writeScreen(self.conf.image_dir + recordFrameName)
-                if recordScreen:
-                    self.videoLog.setTags(episodeNum, self.sumGameSteps, self.pacman.eps, info)
-                    self.videoLog.appendFrame(display)
-
-                # Break if max steps reached
-                if self.sumGameSteps == self.conf.max_steps_per_game:
-                    self.gameDone = True
-
+                self.postOneStep(recordScreen, display, info)
+            
+            # Perform episode finalizing Ssteps
             self.postTrainingEpisode()
 
         self.finalize()
