@@ -65,10 +65,13 @@ class Agent():
         if self.eps > self.conf.test_eps and decayEps:
             self.eps *= self.agentConf.decay_factor
     
-    def train(self):
+    def train(self, shuffle=True):
         while True:
+            # shuffle the batch 
+            if shuffle: self.trainBuffer.shuffle()
             # Get next batch
-            stateBatch, newStateBatch, actionBatch, rewardBatch = self.trainBuffer.next_batch(self.agentConf.train_batch_size)
+            stateBatch, newStateBatch, actionBatch, rewardBatch = \
+                self.trainBuffer.next_batch(self.agentConf.train_batch_size)
             if stateBatch.size == 0:
                 break
             # make batched predicitons

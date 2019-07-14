@@ -224,6 +224,7 @@ class PacMan(Entity):
     def update(self):
         # gets called every frame by the engine
         self.filter_legal_actions()
+        print(self.taken_illegal_action)
         
         self.set_movement()
         
@@ -258,14 +259,15 @@ class PacMan(Entity):
         # pacman gets negative reward for trying to
         # execute illegal actions 
         if self.taken_illegal_action:
-            self.reward += -10
+            self.reward += -0.05
             
         if self.lost:
-            self.reward -= 1000
+            self.reward -= -1
         
         if self.collected_all_coins:
-            self.reward += 1000
+            self.reward += 1
         
+        print(self.reward)
         return self.reward
     
     def check_for_coins(self):
@@ -351,12 +353,12 @@ class Ghost(Entity):
         return dist
     
     def calculate_reward(self):
-        normalized_distance = self.distance_to_pacman() / 100
+        normalized_distance = self.distance_to_pacman() / 1000
         self.reward = -normalized_distance
         if self.taken_illegal_action: 
-            self.reward -= 10
+            self.reward -= -0.5
         if self.caught_pacman: 
-            self.reward += 100
+            self.reward += 1
 
     def update(self):
         self.filter_legal_actions()
@@ -364,7 +366,7 @@ class Ghost(Entity):
         # horizontal collision and movement
         # check if a collision has happened
 
-        self.grid_move()
+        self.move()
         self.calculate_reward()
         #print(f"ghost reward is: {self.reward}")
     

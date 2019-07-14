@@ -86,7 +86,7 @@ class Env:
         # playables
         self.ghost = Ghost(
             [self.ghosts, self.entities], self.platforms, self.playables,
-            (self.TILE_SIZE*1, self.TILE_SIZE*3),
+            (self.TILE_SIZE*8, self.TILE_SIZE*8),
             self.expConfig.ghost_speed,
             self.grid_level)
         self.ghost2 = Ghost(
