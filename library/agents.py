@@ -71,7 +71,7 @@ class Agent():
             if shuffle: self.trainBuffer.shuffle()
             # Get next batch
             stateBatch, newStateBatch, actionBatch, rewardBatch = \
-                self.trainBuffer.next_batch(self.agentConf.train_batch_size)
+                self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
             if stateBatch.size == 0:
                 break
             # make batched predicitons

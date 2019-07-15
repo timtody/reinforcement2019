@@ -46,6 +46,7 @@ def runExp(*args, **kwargs):
     if conf.write_conf:
         conf.writeConfigToDisk(conf.log_dir)
 
+    global_step = 0
     # Run
     print("Training...")
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f}\
@@ -94,40 +95,36 @@ def runExp(*args, **kwargs):
             startTime = time()
             newState, reward, done, info, display = stepEnv(conf, env, recordScreen)
             timeStepGame += time()-startTime
-            
-            if (episodeNum // conf.n_games_per_agent) % 2 == 0:
-                #training pac man for n_games_per_agent episodes
-                trainingPacman = True       
-                pacman.storeExperience(
+
+            # store experience
+            pacman.storeExperience(
                     state,
                     newState, 
                     action, 
                     reward["pacman"], 
                     conf.pacman_reward_type)
-                # dirty: log experience for ghost here
-                # todo: find a better way of designing 
-                # the adversarial architecture
-                ghost1.rewardSum += reward["ghosts"][0]
-                if pacman.trainBuffer.full():
-                    pacman.train()
-                    print('Performed a Pacman training\
-                         step in',time()-startTime,'seconds.')
-            else:
-                # train ghost for n_games_per_agent episodes   
-                trainingPacman = False 
-                ghost1.storeExperience(
+            
+            ghost1.storeExperience(
                     state, 
                     newState, 
                     actionGhost1, 
                     reward["ghosts"][0])
-                # dirty: log experience for pacman here
-                # todo: find a better way of designing
-                # the adversarial architecture
-                pacman.rewardSum += reward["pacman"]
-                if ghost1.trainBuffer.full():
+            
+            # train agents
+            if global_step >= conf.n_prewarm_steps:
+                # we dont train before we don't have enough steps accumulated
+                if (episodeNum // conf.n_games_per_agent) % 2 == 0:
+                    # train pacman
+                    pacman.train()
+                    print(f"pacman eps: {pacman.eps}")
+                    print('Performed a Pacman training\
+                         step in',time()-startTime,'seconds.')
+                else:
+                    # train ghost
                     ghost1.train()
                     print('Performed a Ghost training\
                          step in',time()-startTime,'seconds.')
+                         
 
             # Prepare for next round
             state = newState
@@ -135,6 +132,7 @@ def runExp(*args, **kwargs):
             # Logging
             sumGameSteps += 1
             sumExperiences += 1
+            global_step += 1
 
             # Write Video Data / Debug Images
             if episodeNum % conf.record_every == 0 and conf.save_debug_images:

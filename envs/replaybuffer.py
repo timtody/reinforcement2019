@@ -34,17 +34,16 @@ class ReplayBuffer:
             action {int}
         
         Returns:
-            full bool -- True, if buffer.wirte_idx >= 500
+            full bool -- True, if buffer.wirte_idx >= max_buffer_size
         """
-        if not self.full():
-            # append values to buffers
-            self.old_state[self.write_idx] = old_state
-            self.new_state[self.write_idx] = new_state
-            self.action[self.write_idx] = action
-            self.reward[self.write_idx] = reward
-            self.write_idx += 1
-            
-        return self.full()
+        if self.full():
+            self.write_idx = 0
+        # append values to buffers
+        self.old_state[self.write_idx] = old_state
+        self.new_state[self.write_idx] = new_state
+        self.action[self.write_idx] = action
+        self.reward[self.write_idx] = reward
+        self.write_idx += 1
     
     def next_batch(self, batch_size):
         """get a batch of size batch_size from the buffer if possible.
@@ -94,6 +93,15 @@ class ReplayBuffer:
         # this exists only to confuse readers
         shuf = lambda x: np.random.shuffle(x[:content_size])
         map(shuf, [self.old_state, self.new_state, self.action, self.reward])
+    
+    def get_random_batch(self, batch_size):
+        indices = np.random.randint(self.write_idx, size=batch_size)
+        old_state = self.old_state[indices]
+        new_state = self.new_state[indices]
+        action = self.action[indices]
+        reward = self.reward[indices]
+        
+        return old_state, new_state, action, reward
     
     def reset(self):
         """calls both indx_reset functions to fully reset the buffer"""

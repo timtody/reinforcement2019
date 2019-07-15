@@ -224,7 +224,6 @@ class PacMan(Entity):
     def update(self):
         # gets called every frame by the engine
         self.filter_legal_actions()
-        print(self.taken_illegal_action)
         
         self.set_movement()
         
@@ -267,7 +266,6 @@ class PacMan(Entity):
         if self.collected_all_coins:
             self.reward += 1
         
-        print(self.reward)
         return self.reward
     
     def check_for_coins(self):
