@@ -21,6 +21,7 @@ class ReplayBuffer:
         self.write_idx = 0
         self.empty = self._isempty
         self.full = self._isfull
+        self.filled = False
     
     def append(self, old_state, new_state, action, reward):
         """Appends a single batch to the buffer. old_state and
@@ -38,6 +39,7 @@ class ReplayBuffer:
         """
         if self.full():
             self.write_idx = 0
+            self.filled = True
         # append values to buffers
         self.old_state[self.write_idx] = old_state
         self.new_state[self.write_idx] = new_state
@@ -95,7 +97,11 @@ class ReplayBuffer:
         map(shuf, [self.old_state, self.new_state, self.action, self.reward])
     
     def get_random_batch(self, batch_size):
-        indices = np.random.randint(self.write_idx, size=batch_size)
+        print("buffer full: " + str(self.filled))
+        if not self.filled:
+            indices = np.random.randint(self.write_idx, size=batch_size)
+        else:
+            indices = np.random.randint(self.max_buffer_size, size=batch_size)
         old_state = self.old_state[indices]
         new_state = self.new_state[indices]
         action = self.action[indices]

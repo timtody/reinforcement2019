@@ -66,33 +66,33 @@ class Agent():
             self.eps *= self.agentConf.decay_factor
     
     def train(self, shuffle=True):
-        while True:
-            # shuffle the batch 
-            if shuffle: self.trainBuffer.shuffle()
-            # Get next batch
-            stateBatch, newStateBatch, actionBatch, rewardBatch = \
-                self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
-            if stateBatch.size == 0:
-                break
-            # make batched predicitons
-            # here the rewards per state are predicted, not the states. Hence the renaming
-            predRewards = self.model.predict(stateBatch)
-            predNewRewards = self.model.predict(newStateBatch)
+        # while True:
+        # shuffle the batch 
+        # Get next batch
+        self.eps = self.agentConf.decay_factor* self.eps
+        stateBatch, newStateBatch, actionBatch, rewardBatch = \
+            self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
+        if stateBatch.size == 0:
+            pass
+        # make batched predicitons
+        # here the rewards per state are predicted, not the states. Hence the renaming
+        predRewards = self.model.predict(stateBatch)
+        predNewRewards = self.model.predict(newStateBatch)
 
-            # calculate Targets
-            # note that Q(s, a) = r + alph * max(Q(s', a'))
-            targetRewards = rewardBatch + self.agentConf.y * np.max(predNewRewards, axis=1)
-            trainTargets = predRewards
-            for i in range(0,len(actionBatch)):
-                trainTargets[i,int(actionBatch[i])] = targetRewards[i]
+        # calculate Targets
+        # note that Q(s, a) = r + alph * max(Q(s', a'))
+        targetRewards = rewardBatch + self.agentConf.y * np.max(predNewRewards, axis=1)
+        trainTargets = predRewards
+        for i in range(0,len(actionBatch)):
+            trainTargets[i,int(actionBatch[i])] = targetRewards[i]
 
-            # Train model
-            history = self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
-            loss = history.history['loss']
-            self.lossLog.append(loss)
+        # Train model
+        history = self.model.fit(stateBatch, trainTargets, epochs=1, verbose=0)
+        loss = history.history['loss']
+        self.lossLog.append(loss)
 
         # Reset Buffers
-        self.trainBuffer.reset()
+        #self.trainBuffer.reset()
 
     def saveAgentState(self):
         if self.conf.save_models:

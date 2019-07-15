@@ -1,4 +1,5 @@
 import plotter
+import sys
 import numpy as np
 from time import time
 from library import inout, config, agents, models
@@ -115,16 +116,19 @@ def runExp(*args, **kwargs):
                 # we dont train before we don't have enough steps accumulated
                 if (episodeNum // conf.n_games_per_agent) % 2 == 0:
                     # train pacman
-                    pacman.train()
-                    print(f"pacman eps: {pacman.eps}")
-                    print('Performed a Pacman training\
-                         step in',time()-startTime,'seconds.')
+                    if global_step % conf.train_every == 0:
+                        pacman.train()
+                        print("pacman eps: " + str(pacman.eps))
+                        print('Performed a Pacman training\
+                            step in',time()-startTime,'seconds.')
                 else:
                     # train ghost
-                    ghost1.train()
-                    print('Performed a Ghost training\
-                         step in',time()-startTime,'seconds.')
-                         
+                    if global_step % conf.train_every == 0:
+                        ghost1.train()
+                        print('Performed a Ghost training\
+                            step in',time()-startTime,'seconds.')
+                
+
 
             # Prepare for next round
             state = newState
