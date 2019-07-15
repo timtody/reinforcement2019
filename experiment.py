@@ -195,12 +195,11 @@ def runExp(*args, **kwargs):
 def testPacman(pacman, conf, episodeNum):
     # Save Training Params
     trainEps = pacman.eps
-    print(f'testing... (current train eps {trainEps:0.3f},\
-         test eps {conf.test_eps})')
+    print('testing... (current train eps ' + str(trainEps) + 'test eps ' + str(conf.test_eps) + ')')
     pacman.eps = conf.test_eps
 
     # Init Logs
-    videoLog = inout.VideoWriter(conf.video_dir, f'test_ep{episodeNum}')
+    videoLog = inout.VideoWriter(conf.video_dir, 'test_ep' + str(episodeNum))
     logAvgRewardPerLevel = []
     logAvgStepsPerLevel = []
 
