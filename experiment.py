@@ -2,7 +2,7 @@ import plotter
 import sys
 import numpy as np
 from time import time
-from library import inout, config, agents, models
+from library import inout, config, agents, models, logger
 from default_configs import defaultConfig, pacmanNetConfig
 from envs import mazewandererenv, replaybuffer
 
@@ -284,6 +284,14 @@ def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime):
     plotter.modelLoss(conf,
                       pacman.lossLog,
                       pacman.name)
+    
+    logDump = logger.Logger(logs=[
+        ('pacmanReward', pacman.rewardLog),
+        ('stepsPerGame', logStepsPerGame),
+        ('avgStepTime', logAvgStepTime),
+        ('pacmanModelLoss', pacman.lossLog)
+    ])
+    logDump.saveToDisk(conf.log_dir + "history.pickle")
 
 def plotTesting(conf, logTestAvgReward, logTestAvgSteps):
     plotter.pacmanTestReward(conf, logTestAvgReward)
