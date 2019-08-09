@@ -58,18 +58,19 @@ class Agent():
 
         self.trainBuffer.append(oldState, newState, action, reward)
 
-    def prepForNextGame(self, decayEps=True):
+    def prepForNextGame(self):
         self.rewardLog.append(self.rewardSum)
         self.rewardSum = 0
-        # Decay Epsilon
-        if self.eps > self.conf.test_eps and decayEps:
-            self.eps *= self.agentConf.decay_factor
     
     def train(self, shuffle=True):
         # while True:
         # shuffle the batch 
         # Get next batch
-        self.eps = self.agentConf.decay_factor* self.eps
+        
+        # Decay Epsilon
+        if self.eps > self.conf.test_eps:
+            self.eps = self.agentConf.decay_factor* self.eps
+        
         stateBatch, newStateBatch, actionBatch, rewardBatch = \
             self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
         if stateBatch.size == 0:
