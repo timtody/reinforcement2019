@@ -277,6 +277,15 @@ class Level:
             "PPP P PPP",
             "PPP   PPP",
             "PPPPPPPPP", ]
+        
+        self.levelDict['avoid_easy'] = [
+            "PPPPPPPPP",
+            "PPP   PPP",
+            "PPP P PPP",
+            "P   A   P",
+            "P PPPPP P",
+            "PTPPPPP P",
+            "PPPPPPPPP", ]
     
         self.levelDict['extended'] = [
             "PPPPPPPPP",
@@ -289,9 +298,9 @@ class Level:
         
         self.levelDict['extended_ghost'] = [
             "PPPPPPPPP",
-            "PP     PP",
+            "PPT T TPP",
             "PP P P PP",
-            "PT  A   P",
+            "PT  A T P",
             "PP P P PP",
-            "PP     PP",
+            "PPT T TPP",
             "PPPPPPPPP", ]

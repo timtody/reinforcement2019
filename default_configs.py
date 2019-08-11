@@ -21,7 +21,7 @@ def pacmanNetConfig():
     # Q-Learning Parameters
     rc.y = 0.95
     rc.eps = 1
-    rc.decay_factor = 0.99995
+    rc.decay_factor = 0.9997
 
     rc.replay_buffer_size = 501
     rc.train_batch_size = 500
