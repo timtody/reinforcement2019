@@ -125,6 +125,7 @@ def runExp(*args, **kwargs):
                     # train ghost
                     if global_step % conf.train_every == 0:
                         ghost1.train()
+                        print("ghost eps: " + str(ghost1.eps))
                         print('Performed a Ghost training\
                             step in',time()-startTime,'seconds.')
                 
@@ -132,6 +133,10 @@ def runExp(*args, **kwargs):
 
             # Prepare for next round
             state = newState
+
+            # global step out
+            if global_step % 100000 == 0:
+                print("Training for " + str(global_step) + " steps in total.")
 
             # Logging
             sumGameSteps += 1
@@ -169,7 +174,7 @@ def runExp(*args, **kwargs):
         
         # Prepare agents for next game round
 
-        if (episodeNum // conf.n_games_per_agent) % 2 == 0:
+        if (episodeNum // conf.n_games_per_agent) % 2 == 1:
             pacman.prepForNextGame()
             ghost1.prepForNextGame(decayEps=False)
         else:

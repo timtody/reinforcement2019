@@ -33,8 +33,8 @@ class Level:
         # Race Track
         self.levelDict['Race'] = [
             "PPPPPPPPPPPPPPPPPPPP",
-            "PPPPPPPPPPPPPPPPPPPP",
-            "PPPPPPPPPPPPPPPPPPPP",
+            "PPPTPPPPPPPPPPPPPPPP",
+            "PPP PPPPPPPPPPPPPPPP",
             "PPP PPPPPPPPPPPPPPPP",
             "PPP PPPPPPPPPPPPPPPP",
             "PPP PPPPPPPPPPPPPPPP",
@@ -93,24 +93,21 @@ class Level:
             "PPPPPPPPPPPPPPPPPPPP", ]
 
         self.levelDict['RaceGhostX'] = [
-            "PPPPPPPPPPPPPPPPPPPP",
-            "PPPPPPPPPPPPPPPPPPPP",
-            "PP                PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPPXPPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP PPPPPXPP PPPPP PP",
-            "PP                PP",
-            "PPPPPPPPPPPPPPPPPPPP",
-            "PPPPPPPPPPPPPPPPPPPP", ]
+            "PPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPP",
+            "PP              PP",
+            "PP PPPPXPP PPPP PP",
+            "PP PPPPXPP PPPP PP",
+            "PP PPPPXPPPPPPP PP",
+            "PP PPPPXP PPPPP PP",
+            "PP PPPPPP PPPPP PP",
+            "PP PPPPPP PPPPP PP",
+            "PP PPPPPP PPPPP PP",
+            "PP PPPPPP PPPPP PP",
+            "PPPPPPPPP PPPPP PP",
+            "P               PP",
+            "PPPPPPPPPPPPPPPPPP",
+            "PPPPPPPPPPPPPPPPPP", ]
         
         self.levelDict['AvoidGhost'] = [
             "PPPPPPPPPPPPPPPPPPPP",
@@ -234,3 +231,67 @@ class Level:
             "P PPP P PPPP P PPP P",
             "P     P      P     P",
             "PPPPPPPPPPPPPPPPPPPP", ]
+        
+        
+        self.levelDict['simple_race'] = [
+            "PPPPPPPPP",
+            "PPPPPPPPP",
+            "PPPPPPPPP",
+            "PT      P",
+            "PPPPPPPPP",
+            "PPPPPPPPP",
+            "PPPPPPPPP", ]
+        
+        self.levelDict['medium_race'] = [
+            "PPPPPPPPP",
+            "PT      P",
+            "PPPPPPP P",
+            "PPPPPPP P",
+            "PPPPPPP P",
+            "P       P",
+            "PPPPPPPPP", ]
+        
+        self.levelDict['hard_race'] = [
+            "PPPPPPPPP",
+            "PT      P",
+            "PPPPPPP P",
+            "P     P P",
+            "P PPPPP P",
+            "P       P",
+            "PPPPPPPPP", ]
+        
+        self.levelDict['cross'] = [
+            "PPPPPPPPP",
+            "PPPP PPPP",
+            "PPPP PPPP",
+            "P   T   P",
+            "PPPP PPPP",
+            "PPPP PPPP",
+            "PPPPPPPPP", ]
+    
+        self.levelDict['avoid'] = [
+            "PPPPPPPPP",
+            "PPP   PPP",
+            "PPP P PPP",
+            "PT  A   P",
+            "PPP P PPP",
+            "PPP   PPP",
+            "PPPPPPPPP", ]
+    
+        self.levelDict['extended'] = [
+            "PPPPPPPPP",
+            "PP     PP",
+            "PP P P PP",
+            "PT      P",
+            "PP P P PP",
+            "PP     PP",
+            "PPPPPPPPP", ]
+        
+        self.levelDict['extended_ghost'] = [
+            "PPPPPPPPP",
+            "PP     PP",
+            "PP P P PP",
+            "PT  A   P",
+            "PP P P PP",
+            "PP     PP",
+            "PPPPPPPPP", ]

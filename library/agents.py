@@ -11,6 +11,9 @@ class Agent():
         self.__initLoggers()
 
     def __setupModel(self, model, printSummary=False, loadWeights=False):
+        self.agentConf.input_x_dim = self.conf.screen_x_comp
+        self.agentConf.input_y_dim = self.conf.screen_y_comp
+        self.agentConf.input_shape = (self.conf.screen_y_comp, self.conf.screen_x_comp, 1)
         self.model, optimizer = model(self.agentConf)
         self.model.compile(optimizer=optimizer, loss='mse')
         self.eps = self.agentConf.eps
@@ -26,7 +29,6 @@ class Agent():
         if self.conf.write_conf:
             self.agentConf.writeConfigToDisk(self.conf.log_dir+self.name+"_")
 
-        self.trainDelay = self.agentConf.num_train_after_experiences
     
     def __initBuffers(self):
         self.trainBuffer = ReplayBuffer(self.agentConf.input_shape, self.agentConf.replay_buffer_size)
@@ -72,6 +74,7 @@ class Agent():
         self.eps = self.agentConf.decay_factor* self.eps
         stateBatch, newStateBatch, actionBatch, rewardBatch = \
             self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
+
         if stateBatch.size == 0:
             pass
         # make batched predicitons

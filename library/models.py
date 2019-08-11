@@ -7,7 +7,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras import optimizers
 def definePacmanTestModel1(conf):
     # Define Model
-    inputShape = (conf.input_x_dim, conf.input_y_dim, conf.c_channels)
+    inputShape = (conf.input_y_dim, conf.input_x_dim, conf.c_channels)
 
     state = Input(inputShape)                                                                                           # pre 0 in
     x = Conv2D(32, (3, 3), activation='relu', padding='same', name='Conv0')(state)                                      # conv 0

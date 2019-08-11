@@ -97,7 +97,6 @@ class ReplayBuffer:
         map(shuf, [self.old_state, self.new_state, self.action, self.reward])
     
     def get_random_batch(self, batch_size):
-        print("buffer full: " + str(self.filled))
         if not self.filled:
             indices = np.random.randint(self.write_idx, size=batch_size)
         else:
