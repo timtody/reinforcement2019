@@ -176,11 +176,11 @@ def runExp(*args, **kwargs):
 
 <<<<<<< HEAD
         if (episodeNum // conf.n_games_per_agent) % 2 == 1:
-            pacman.prepForNextGame()
+        pacman.prepForNextGame()
             ghost1.prepForNextGame(decayEps=False)
         else:
             pacman.prepForNextGame(decayEps=False)
-            ghost1.prepForNextGame()
+        ghost1.prepForNextGame()
 =======
         pacman.prepForNextGame()
         ghost1.prepForNextGame()
