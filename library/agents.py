@@ -74,7 +74,7 @@ class Agent():
             self.eps = self.agentConf.decay_factor* self.eps
         
         stateBatch, newStateBatch, actionBatch, rewardBatch = \
-            self.trainBuffer.get_random_batch(self.agentConf.train_batch_size)
+            self.trainBuffer.get_weighted_batch(self.agentConf.train_batch_size)
 
         if stateBatch.size == 0:
             pass

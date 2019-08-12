@@ -1,17 +1,18 @@
 import numpy as np 
 
 class ReplayBuffer:
-    def __init__(self, observation_shape, max_buffer_size=500):
+    def __init__(self, observation_shape, max_buffer_size=500, alpha=2):
         """Initializes buffer which stores a tuple of observations
            containing old_state, new_state, action, reward of arbitrary sizes
         
         Arguments:
             observation_shape {tuple} -- must be of shape (observation_dim0 x observation_dim1)
-            i.e. just pass observation.shape here
+             i.e. just pass observation.shape here
         
         Keyword Arguments:
             max_buffer_size {int} -- maximum size of the buffer (default: {500})
         """
+        self.alpha = alpha
         self.max_buffer_size = max_buffer_size
         self.old_state = np.empty(shape=(max_buffer_size, *observation_shape))
         self.new_state = np.empty(shape=(max_buffer_size, *observation_shape))
@@ -101,6 +102,30 @@ class ReplayBuffer:
             indices = np.random.randint(self.write_idx, size=batch_size)
         else:
             indices = np.random.randint(self.max_buffer_size, size=batch_size)
+        old_state = self.old_state[indices]
+        new_state = self.new_state[indices]
+        action = self.action[indices]
+        reward = self.reward[indices]
+        
+        return old_state, new_state, action, reward
+
+    def get_weighted_batch(self, batch_size):
+        if not self.filled:
+            # compute the weights first
+            rewards = self.reward[:self.write_idx]
+            rewards_shifted = rewards + np.min(rewards)
+            exp_rewards = rewards_shifted**self.alpha
+            sum_of_entries = np.sum(exp_rewards)
+            weights = exp_rewards / sum_of_entries
+            indices = np.random.choice(self.write_idx, size=batch_size, p=weights)
+        else:
+            # compute the weights first
+            rewards = self.reward
+            rewards_shifted = rewards + np.min(rewards)
+            exp_rewards = rewards_shifted**self.alpha
+            sum_of_entries = np.sum(exp_rewards)
+            weights = exp_rewards / sum_of_entries
+            indices = np.random.randint(self.max_buffer_size, size=batch_size, p=weights)
         old_state = self.old_state[indices]
         new_state = self.new_state[indices]
         action = self.action[indices]
