@@ -125,7 +125,7 @@ class ReplayBuffer:
             exp_rewards = rewards_shifted**self.alpha
             sum_of_entries = np.sum(exp_rewards)
             weights = exp_rewards / sum_of_entries
-            indices = np.random.randint(self.max_buffer_size, size=batch_size, p=weights)
+            indices = np.random.choice(self.max_buffer_size, size=batch_size, p=weights)
         old_state = self.old_state[indices]
         new_state = self.new_state[indices]
         action = self.action[indices]
