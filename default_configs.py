@@ -23,7 +23,7 @@ def pacmanNetConfig():
     rc.eps = 1
     rc.decay_factor = 0.9997
 
-    rc.replay_buffer_size = 501
+    rc.replay_buffer_size = 500
     rc.train_batch_size = 500
     # rc.num_train_after_experiences = 500
 
@@ -38,12 +38,15 @@ def defaultConfig():
     # Training parameters
     rc.num_episodes = 5000
     rc.n_games_per_agent = 5000
+    rc.train_every = 500
+    rc.n_prewarm_steps = 500
     rc.run_validation = False
+    rc.pacman_active = True # Train and move Pacman
     
     # Game Config
     rc.start_level_name = 'FullSingle' # Options: Full, FullSingle, Chaos, Race, Race2, Empty
     rc.switch_levels = {} # example: {5:'Chaos', 7:'FullSingle'} {<ep_num>:'<level>', <ep_num>:'<nextlevel>', ...}
-    rc.pacman_start_poses=[(2,2), (15,2), (2,15),(15,15)]
+    rc.pacman_start_poses=[] # deprecated
     rc.display_game = True
 
     # Random seed
