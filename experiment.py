@@ -82,7 +82,8 @@ def runExp(*args, **kwargs):
         while not done:
             # Select Action (Epsilon-Greedy)
             action = pacman.getAction(state)
-            env.player.action = env.player.ActionSpace(action)
+            if conf.pacman_active:
+                env.player.action = env.player.ActionSpace(action)
             
             # Non Random Ghosts
             actionGhost1 = ghost1.getAction(state)
@@ -114,7 +115,8 @@ def runExp(*args, **kwargs):
             # train agents
             if global_step >= conf.n_prewarm_steps:
                 # we dont train before we don't have enough steps accumulated
-                if (episodeNum // conf.n_games_per_agent) % 2 == 0:
+                if conf.pacman_active and ((episodeNum // conf.n_games_per_agent) % 2 == 0):
+                    print('nay')
                     # train pacman
                     if global_step % conf.train_every == 0:
                         pacman.train()
@@ -122,6 +124,7 @@ def runExp(*args, **kwargs):
                         print('Performed a Pacman training\
                             step in',time()-startTime,'seconds.')
                 else:
+                    print('yay')
                     # train ghost
                     if global_step % conf.train_every == 0:
                         ghost1.train()
