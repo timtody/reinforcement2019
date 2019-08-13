@@ -19,6 +19,24 @@ def pacmanAgentReward(conf, rewardPerGame):
     
     plt.close()
 
+def ghostAgentReward(conf, rewardPerGame):
+    x = list(range(1,len(rewardPerGame)+1))
+    
+    plt.plot(x, rewardPerGame)
+    plt.ylabel('Reward')
+    plt.xlabel("Game")
+    
+    plt.title("Reward: Ghost Agent")
+    plt.xlim((1,len(rewardPerGame)))
+
+    if conf.save_plots:
+        plt.savefig(conf.log_dir + 'ghostReward.png')
+
+    if conf.show_plots:
+        plt.show()
+    
+    plt.close()
+
 def pacmanAgentSteps(conf, stepsPerGame):
     x = list(range(1,len(stepsPerGame)+1))
     

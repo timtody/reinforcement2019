@@ -51,7 +51,7 @@ def runExp(*args, **kwargs):
     # Run
     print("Training...")
     statusOut = "Game {0:05d}/{1:05d}: steps={2:07d} rewardTotal={3:04.1f}\
-                timeStepGame={4:3.4f}s"
+                timeStepGame={4:3.4f}s rGhost={3:04.1f}"
     for episodeNum in range(conf.num_episodes):
 
         if conf.run_validation and episodeNum % conf.test_every == 0:
@@ -115,7 +115,7 @@ def runExp(*args, **kwargs):
             # train agents
             if global_step >= conf.n_prewarm_steps:
                 # we dont train before we don't have enough steps accumulated
-                if conf.pacman_active and ((episodeNum // conf.n_games_per_agent) % 2 == 0):
+                if conf.pacman_active and ((episodeNum // conf.n_games_per_agent) % 2 == 1):
                     # train pacman
                     if global_step % conf.train_every == 0:
                         pacman.train()
@@ -171,7 +171,8 @@ def runExp(*args, **kwargs):
                                conf.num_episodes,
                                sumGameSteps,
                                pacman.rewardSum,
-                               timeStepGame/sumGameSteps))
+                               timeStepGame/sumGameSteps,
+                               ghost1.rewardSum))
         
         # Prepare agents for next game round
 
@@ -180,7 +181,7 @@ def runExp(*args, **kwargs):
 
         # Occasionally plot intemediate Results
         if (episodeNum + 1) % 100 == 0:
-             plotTraining(conf, pacman, logStepsPerGame,\
+             plotTraining(conf, pacman, ghost1, logStepsPerGame,\
                   logAvgStepTime)
 
 
@@ -271,10 +272,11 @@ def stepEnv(conf, env, recordScreen):
     state = np.reshape(obs["pacman"], (obs["pacman"].shape[0],obs["pacman"].shape[1],1))
     return state, reward, done, info, display
 
-def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime):
+def plotTraining(conf, pacman, ghost1, logStepsPerGame, logAvgStepTime):
     plotter.pacmanAgentReward(conf, 
                             pacman.rewardLog)
-    
+    plotter.pacmanAgentReward(conf, 
+                            ghost1.rewardLog)
     #rewardLogSmooth = np.convolve(pacman.rewardLog, np.ones((100,))/100, mode='valid')
     #plotter.pacmanAgentReward(conf, rewardLogSmooth)
 
@@ -292,7 +294,8 @@ def plotTraining(conf, pacman, logStepsPerGame, logAvgStepTime):
         ('pacmanReward', pacman.rewardLog),
         ('stepsPerGame', logStepsPerGame),
         ('avgStepTime', logAvgStepTime),
-        ('pacmanModelLoss', pacman.lossLog)
+        ('pacmanModelLoss', pacman.lossLog),
+        ('ghostReward', ghost1.rewardLog)
     ])
     logDump.saveToDisk(conf.log_dir + "history.pickle")
 

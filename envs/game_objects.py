@@ -351,12 +351,12 @@ class Ghost(Entity):
         return dist
     
     def calculate_reward(self):
-        normalized_distance = self.distance_to_pacman() / 1000
+        normalized_distance = self.distance_to_pacman() / 100
         self.reward = -normalized_distance
+        if self.reward <= 0.001:
+            self.reward += 0
         if self.taken_illegal_action: 
-            self.reward -= -0.5
-        if self.caught_pacman: 
-            self.reward += 1
+            self.reward -= 0
 
     def update(self):
         self.filter_legal_actions()

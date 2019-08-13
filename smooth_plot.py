@@ -7,6 +7,13 @@ import sys
 import argparse
 import os
 
+color_schemes = {
+    "green": {"light": "#99c4a0", "dark": "#276631"},
+    "orange": {"light": "#facfa5", "dark": "#ff560e"},
+    "blue" : {"light": "#88aab5", "dark": "#1c4957"},
+}
+
+
 def rolling_average(data, window_size=999):
     # window size can only be odd
     # we compute a padding dependant on the window size
@@ -28,14 +35,12 @@ def rolling_average(data, window_size=999):
         data[i] = np.mean(data_in[i:i+window_size])
     return data
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('path')
 parser.add_argument('--color', default="orange")
 args = parser.parse_args()
 path = args.path
 color = args.color
-
 
 fullPathToHistoryPickle = path
 logs = lg.Logger(loadPath=fullPathToHistoryPickle)
@@ -48,15 +53,6 @@ y_smooth = rolling_average(y, 333)
 import matplotlib
 from matplotlib.backends.backend_pgf import FigureCanvasPgf
 matplotlib.backend_bases.register_backend('pdf', FigureCanvasPgf)
-
-color_schemes = {
-    "green": {"light": "#99c4a0", "dark": "#276631"},
-    "orange": {"light": "#facfa5", "dark": "#ff560e"},
-    "blue" : {"light": "#88aab5", "dark": "#1c4957"},
-}
-
-dir = r'C:\Users\Julius\Uni\sose19\rl\PacMan'
-#plt.style.use(os.path.join(dir, 'report.mplstyle'))
 
 sns.set(context="paper")
 
@@ -75,7 +71,7 @@ legend = axes[0].legend(loc='upper left')
 
 axes[1].scatter(x[::skip], y[::skip], c=color_schemes["green"]["light"], s=scatter_size)
 axes[1].plot(x[::skip], y_smooth[::skip], c=color_schemes["green"]["dark"], label="Model B")
-axes[1].set(ylabel="Reward")
+axes[1].set(ylabel="Total reward per game")
 legend = axes[1].legend(loc='upper left')
 
 
