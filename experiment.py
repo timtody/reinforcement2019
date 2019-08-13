@@ -275,7 +275,7 @@ def stepEnv(conf, env, recordScreen):
 def plotTraining(conf, pacman, ghost1, logStepsPerGame, logAvgStepTime):
     plotter.pacmanAgentReward(conf, 
                             pacman.rewardLog)
-    plotter.pacmanAgentReward(conf, 
+    plotter.ghostAgentReward(conf, 
                             ghost1.rewardLog)
     #rewardLogSmooth = np.convolve(pacman.rewardLog, np.ones((100,))/100, mode='valid')
     #plotter.pacmanAgentReward(conf, rewardLogSmooth)
