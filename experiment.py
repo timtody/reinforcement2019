@@ -116,7 +116,6 @@ def runExp(*args, **kwargs):
             if global_step >= conf.n_prewarm_steps:
                 # we dont train before we don't have enough steps accumulated
                 if conf.pacman_active and ((episodeNum // conf.n_games_per_agent) % 2 == 0):
-                    print('nay')
                     # train pacman
                     if global_step % conf.train_every == 0:
                         pacman.train()
@@ -124,7 +123,6 @@ def runExp(*args, **kwargs):
                         print('Performed a Pacman training\
                             step in',time()-startTime,'seconds.')
                 else:
-                    print('yay')
                     # train ghost
                     if global_step % conf.train_every == 0:
                         ghost1.train()
