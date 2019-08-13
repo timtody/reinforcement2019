@@ -192,6 +192,7 @@ def runExp(*args, **kwargs):
 
     # Save Models
     pacman.saveAgentState()
+    ghost1.saveAgentState()
 
     # Return Handles for Debugging
     return pacman, conf
